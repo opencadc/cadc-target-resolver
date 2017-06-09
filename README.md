@@ -23,7 +23,7 @@ docker run -p 8080:8080 -p 5555:5555 opencadc/cadc-target-resolver
 
 will start the server.  You can point your browser to http://localhost:8080/cadc-target-resolver/ for the documentation page.
 
-## Existing deployment of Tomcat
+## Existing deployment of a Servlet Container
 
 You can build the WAR yourself with
 
