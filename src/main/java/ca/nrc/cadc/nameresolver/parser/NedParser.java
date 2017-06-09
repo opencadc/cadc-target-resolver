@@ -94,10 +94,10 @@ public class NedParser extends DefaultParser implements Parser
 {
     private final static Logger log = Logger.getLogger(NedParser.class);
 
-    private final String RA_FIELD_NAME = "RA(deg)";
-    private final String DEC_FIELD_NAME = "DEC(deg)";
-    private final String NAME_FIELD_NAME = "Object Name";
-    private final String TYPE_FIELD_NAME = "Type";
+    private static final String RA_FIELD_NAME = "RA(deg)";
+    private static final String DEC_FIELD_NAME = "DEC(deg)";
+    private static final String NAME_FIELD_NAME = "Object Name";
+    private static final String TYPE_FIELD_NAME = "Type";
 
     /**
      * Constructs a new NEDResolver thread initialized with the specified
@@ -227,138 +227,4 @@ public class NedParser extends DefaultParser implements Parser
         }
         return targetData;
     }
-
-//    /**
-//     * An InputStream is passed to the CDS VOTable pull parser which attempts
-//     * to parse out the RA & Dec, object name and type values. The morphology
-//     * for NED is not available and will always be null.
-//     *
-//     * @return TargetData object if successful in parsing out the RA and Dec
-//     *         values, or null if the resolver was unable to resolve the target.
-//     * @throws TargetDataParsingException if unable to parse the results
-//     *         returned from the resolver.
-//     */
-//    @Override
-//    @Override
-//    public TargetData parse()
-//        throws TargetDataParsingException
-//    {
-//        ByteArrayInputStream inputStream = new ByteArrayInputStream(getResults().getBytes());
-//        SavotPullParser sb = new SavotPullParser(inputStream, SavotPullEngine.FULL, "UTF-8");
-//
-//        SavotVOTable sv = sb.getVOTable();
-//        if (sv == null)
-//        {
-//            final String message = "Error parsing NED data for a VOTable";
-//            log.debug(message + "\n" + getResults());
-//            throw new TargetDataParsingException(message);
-//        }
-//
-//        ResourceSet rs = sv.getResources();
-//        if (rs.getItemCount() == 0)
-//        {
-//            final String message = "NED VOTable contains no resources";
-//            log.debug(message + "\n" + getResults());
-//            throw new TargetDataParsingException(message);
-//        }
-//
-//        SavotResource resource = (SavotResource)rs.getItemAt(0);
-//        if (resource == null)
-//        {
-//            final String message = "NED VOTable contains null or empty resource";
-//            log.debug(message + "\n" + getResults());
-//            throw new TargetDataParsingException(message);
-//        }
-//
-//        TableSet tables = resource.getTables();
-//        if (tables == null)
-//        {
-//            final String message = "Parsing error, NED VOTable resource table not found";
-//            log.debug(message + "\n" + getResults());
-//            throw new TargetDataParsingException(message);
-//        }
-//
-//        SavotTable table = (SavotTable) tables.getItemAt(0);
-//        if (table == null)
-//        {
-//            final String message = "Parsing error, NED VOTable empty resource table";
-//            log.debug(message + "\n" + getResults());
-//            throw new TargetDataParsingException(message);
-//        }
-//
-//        // Check for param name Error in the table, indicates target not found.
-//        ParamSet ps = table.getParams();
-//        for (int j = 0; j < ps.getItemCount(); j++)
-//        {
-//            SavotParam param = (SavotParam) ps.getItemAt(j);
-//            if (param == null)
-//                continue;
-//            if (param.getName().equalsIgnoreCase("error"))
-//            {
-//                log.debug("Target not found in " + getDatabase());
-//                return null;
-//            }
-//        }
-//
-//        SavotData data = table.getData();
-//        if (data == null)
-//        {
-//            final String message = "Parsing error, NED VOTable data not found";
-//            log.debug(message + "\n" + getResults());
-//            throw new TargetDataParsingException(message);
-//        }
-//
-//        SavotTableData tableData = data.getTableData();
-//        if (tableData == null)
-//        {
-//            final String message = "Parsing error, NED VOTable table data not found";
-//            log.debug(message + "\n" + getResults());
-//            throw new TargetDataParsingException(message);
-//        }
-//
-//        TRSet tableRows = tableData.getTRs();
-//        TDSet td = tableRows.getTDSet(0);
-//
-//        FieldSet fields = table.getFields();
-//        if (fields == null)
-//        {
-//            final String message = "Parsing error, NED VOTable data fields not found";
-//            log.debug(message + "\n" + getResults());
-//            throw new TargetDataParsingException(message);
-//        }
-//
-//        TargetData targetData = null;
-//        Double ra = null;
-//        Double dec = null;
-//        String oname = null;
-//        String otype = null;
-//        for (int i = 0; i < fields.getItemCount(); i++)
-//        {
-//            SavotField field = (SavotField) fields.getItemAt(i);
-//            if (field == null)
-//                continue;
-//
-//            try
-//            {
-//                if (field.getName().equals(RA_FIELD_NAME))
-//                    ra = new Double(td.getContent(i));
-//                if (field.getName().equals(DEC_FIELD_NAME))
-//                    dec = new Double(td.getContent(i));
-//                if (field.getName().equals(NAME_FIELD_NAME))
-//                    oname = td.getContent(i).trim();
-//                if (field.getName().equals(TYPE_FIELD_NAME))
-//                    otype = td.getContent(i).trim();
-//            }
-//            catch (NumberFormatException nfe)
-//            {
-//                final String message = "NED number format exception: " + nfe.getMessage();
-//                log.debug(message + "\n" + getResults());
-//                throw new TargetDataParsingException(message);
-//            }
-//        }
-//        if (ra != null && dec != null)
-//            targetData = new TargetData(getTarget(), getHost(), getDatabase(), ra, dec, oname, otype, null);
-//        return targetData;
-//    }
-//
 }

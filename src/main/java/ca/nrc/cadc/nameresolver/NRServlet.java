@@ -376,7 +376,7 @@ public class NRServlet extends HttpServlet
      * Construct and start the service queries to resolve the target.
      * Returns the results from the first database that has successfully resolved the target,
      * or null if the target was not resolved.
-     * <p>
+     *
      * Allow tests to override.
      *
      * @param selector the selector
@@ -477,7 +477,7 @@ public class NRServlet extends HttpServlet
                                          || responseCode == HttpServletResponse.SC_MOVED_PERMANENTLY)
                                 {
                                     // get the redirect location
-                                    String location = headerParser.getHeader("Location");
+                                    String location = headerParser.getLocation();
                                     log.debug("  redirected[" + responseCode + "] to " + location);
                                     if (location == null)
                                     {
@@ -523,23 +523,24 @@ public class NRServlet extends HttpServlet
     {
         for (Service service : services)
         {
-            createChannel(selector, service.getHost());
+            createChannel(selector, service.getHost(), service.getPort());
         }
     }
 
     /**
      * Create a socket channel with the given host and register connect interest with the selector.
-     * <p>
+     *
      * Override for tests to not actually make a request out.
      *
      * @param selector the selector
      * @param host     the host name
+     * @param port      The port number.
      */
-    void createChannel(Selector selector, String host)
+    void createChannel(Selector selector, String host, final int port)
     {
         try
         {
-            InetSocketAddress address = new InetSocketAddress(host, 80);
+            InetSocketAddress address = new InetSocketAddress(host, port);
             SocketChannel channel = SocketChannel.open();
             channel.configureBlocking(false);
             channel.connect(address);
@@ -558,7 +559,7 @@ public class NRServlet extends HttpServlet
 
     /**
      * Create a socket channel with the given host and register connect interest with the selector.
-     * <p>
+     *
      * Override for tests to not actually make a request out.
      *
      * @param selector the selector
@@ -568,7 +569,7 @@ public class NRServlet extends HttpServlet
     {
         try
         {
-            InetSocketAddress address = new InetSocketAddress(url.getHost(), 80);
+            InetSocketAddress address = new InetSocketAddress(url.getHost(), url.getPort());
             SocketChannel channel = SocketChannel.open();
             channel.configureBlocking(false);
             channel.connect(address);

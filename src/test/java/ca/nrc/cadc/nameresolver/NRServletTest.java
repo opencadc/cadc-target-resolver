@@ -106,11 +106,12 @@ public class NRServletTest
              *
              * @param selector the selector
              * @param host     the host name
+             * @param port     The port number.
              */
             @Override
-            void createChannel(Selector selector, String host)
+            void createChannel(Selector selector, String host, int port)
             {
-
+                // Do nothing.
             }
 
             /**
@@ -199,11 +200,12 @@ public class NRServletTest
              *
              * @param selector the selector
              * @param host     the host name
+             * @param port     The port number.
              */
             @Override
-            void createChannel(Selector selector, String host)
+            void createChannel(Selector selector, String host, int port)
             {
-
+                // Do nothing.
             }
 
             /**
@@ -217,7 +219,7 @@ public class NRServletTest
             @Override
             void createChannel(Selector selector, URL url)
             {
-
+                // Do nothing.
             }
 
             /**

@@ -81,6 +81,7 @@ import java.util.regex.Pattern;
  */
 class HttpHeaderParser
 {
+    private static final String LOCATION_HEADER_KEY = "Location";
     private static final Pattern NEWLINE = Pattern.compile("\n");
     private static final Pattern HEADER_LINE = Pattern.compile("HTTP/(1.[0-9]) ([0-9]{3})(?: [0-9]{3})? ([A-Za-z ]*)");
 
@@ -107,16 +108,11 @@ class HttpHeaderParser
     }
 
     /**
-     * @param key header name.
      * @return the header value, null if it doesn't exist.
      */
-    String getHeader(String key)
+    String getLocation()
     {
-        if (key == null)
-        {
-            throw new NullPointerException();
-        }
-        return headers.get(key.toLowerCase());
+        return headers.get(LOCATION_HEADER_KEY.toLowerCase());
     }
 
     /**

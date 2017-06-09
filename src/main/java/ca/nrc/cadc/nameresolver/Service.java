@@ -72,34 +72,35 @@ package ca.nrc.cadc.nameresolver;
 public enum Service
 {
     // Queries the NED service at CalTech.
-    NED("ned", "ned.ipac.caltech.edu", "/cgi-bin/nph-objsearch?"
-                                       + "extend=no&out_csys=Equatorial"
-                                       + "&out_equinox=J2000.0&obj_sort=RA+or+Longitude"
-                                       + "&of=xml_main&zv_breaker=30000.0"
-                                       + "&list_limit=1&img_stamp=NO"
-                                       + "&objname=", "HTTP/1.0\r\n\r\n", false),
+    NED("ned", "ned.ipac.caltech.edu", 80, "/cgi-bin/nph-objsearch?"
+                                           + "extend=no&out_csys=Equatorial"
+                                           + "&out_equinox=J2000.0&obj_sort=RA+or+Longitude"
+                                           + "&of=xml_main&zv_breaker=30000.0"
+                                           + "&list_limit=1&img_stamp=NO"
+                                           + "&objname=", "HTTP/1.0\r\n\r\n", false),
 
     // Queries the SIMBAD service at CDS.
-    SIMBAD("simbad", "simbad.u-strasbg.fr", "/simbad/sim-id?"
-                                            + "output.max=1&output.format=ASCII"
-                                            + "&obj.coo1=on&obj.coo2=off&obj.coo3=off&obj.coo4=off"
-                                            + "&frame1=ICRS&epoch1=J2000&coodisp1=d"
-                                            + "&obj.pmsel=off&obj.plxsel=off&obj.rvsel=off&obj.spsel=off"
-                                            + "&obj.mtsel=on&obj.sizesel=off&obj.fluxsel=off&list.idsel=off"
-                                            + "&obj.bibsel=off&list.bibsel=off&obj.messel=off&obj.notesel=off"
-                                            + "&Ident=", "Connection: close HTTP/1.1\r\n\r\n", false),
+    SIMBAD("simbad", "simbad.u-strasbg.fr", 80, "/simbad/sim-id?"
+                                                + "output.max=1&output.format=ASCII"
+                                                + "&obj.coo1=on&obj.coo2=off&obj.coo3=off&obj.coo4=off"
+                                                + "&frame1=ICRS&epoch1=J2000&coodisp1=d"
+                                                + "&obj.pmsel=off&obj.plxsel=off&obj.rvsel=off&obj.spsel=off"
+                                                + "&obj.mtsel=on&obj.sizesel=off&obj.fluxsel=off&list.idsel=off"
+                                                + "&obj.bibsel=off&list.bibsel=off&obj.messel=off&obj.notesel=off"
+                                                + "&Ident=", "Connection: close HTTP/1.1\r\n\r\n", false),
 
     // Queries the VizieR services at CADC.
-    VIZIER_CADC("vizier", "vizier.hia.nrc.ca", "/cgi-bin/nph-sesame/-o/V?", "HTTP/1.0\r\n\r\n", true),
+    VIZIER_CADC("vizier", "vizier.hia.nrc.ca", 80, "/cgi-bin/nph-sesame/-o/V?", "HTTP/1.0\r\n\r\n", true),
 
     // Queries the VizieR services at CDS.
-    VIZIER_CDS("vizier", "cdsweb.u-strasbg.fr", "/cgi-bin/nph-sesame/-o/V?", "HTTP/1.0\r\n\r\n", true);
+    VIZIER_CDS("vizier", "cdsweb.u-strasbg.fr", 80, "/cgi-bin/nph-sesame/-o/V?", "HTTP/1.0\r\n\r\n", true);
 
 
     // Name used when referencing it in a business like manner, or as a request parameter.
     private final String commonName;
 
     private final String host;
+    private final int port;
     private final String parameters;
 
     // HTTP information when connecting.
@@ -108,11 +109,12 @@ public enum Service
     private final boolean caseSensitiveFlag;
 
 
-    Service(final String commonName, final String host, final String parameters, final String extraInfo,
+    Service(final String commonName, final String host, int port, final String parameters, final String extraInfo,
             final boolean caseSensitiveFlag)
     {
         this.commonName = commonName;
         this.host = host;
+        this.port = port;
         this.parameters = parameters;
         this.extraInfo = extraInfo;
         this.caseSensitiveFlag = caseSensitiveFlag;
@@ -126,6 +128,11 @@ public enum Service
     public String getHost()
     {
         return host;
+    }
+
+    public int getPort()
+    {
+        return port;
     }
 
     public String getConnectString(final String target)
