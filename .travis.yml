@@ -18,6 +18,7 @@ before_install:
 script:
 - gradle clean dockerize
 - cd integrationTest
+- sed -i 's/@MYHOST@/'"${REGISTRY_HOST}"'/g' root/resource-caps.config
 - docker-compose up -d
 - docker ps -a
 - gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST
