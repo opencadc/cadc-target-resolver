@@ -1,6 +1,5 @@
 ---
 
-layout: default
 app.version: 1004
 
 ---
@@ -8,6 +7,9 @@ app.version: 1004
 
 # cadc-target-resolver
 Name resolving proxy that calls multiple target name resolvers.
+
+<a href="https://travis-ci.org/opencadc/cadc-target-resolver"><img src="https://travis-ci.org/opencadc/cadc-target-resolver.svg?branch=master" /></a>
+
 
 # Running
 
