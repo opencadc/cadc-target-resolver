@@ -1,0 +1,103 @@
+plugins {
+    id 'maven'
+    id 'idea'
+    id 'war'
+}
+
+repositories {
+    jcenter()
+    mavenLocal()
+
+    // CADC repository for the CADC specific library.
+    maven {
+        url = 'http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/m2repo'
+    }
+}
+
+sourceCompatibility = 1.7
+group = 'ca.nrc.cadc'
+version = '1002'
+
+war {
+    archiveName = project.name + '##' + project.version + '.war'
+}
+
+ext {
+    docker_image_name = 'opencadc/cadc-target-resolver'
+}
+
+sourceSets {
+    intTest
+}
+
+configurations {
+    intTestCompile.extendsFrom(testCompile)
+    intTestRuntime.extendsFrom(testRuntime)
+}
+
+idea {
+    module {
+        //and some extra test source dirs
+        testSourceDirs += file('src/intTest/java')
+        scopes.TEST.plus += [ configurations.intTestCompile ]
+    }
+}
+
+dependencies {
+    compile 'log4j:log4j:1.2.+'
+    compile 'org.json:json:20170516'
+    providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
+
+    compile 'org.opencadc:cadc-dali:1.+'
+    compile 'org.opencadc:cadc-util:[1.0.5,)'
+    compile 'org.opencadc:cadc-log:1.+'
+    compile 'org.opencadc:cadc-vosi:1.+'
+
+    runtime 'jstl:jstl:1.2+'
+
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.skyscreamer:jsonassert:1.+'
+    testCompile 'org.easymock:easymock:3.+'
+    testCompile 'org.opencadc:cadc-registry:[1.0.3,)'
+
+    intTestCompile 'org.opencadc:cadc-test-vosi:[1.0.2,)'
+}
+
+task intTest(type: Test) {
+    // set the configuration context
+    testClassesDir = sourceSets.intTest.output.classesDir
+    classpath = sourceSets.intTest.runtimeClasspath
+
+    // run the tests always
+    outputs.upToDateWhen { false }
+
+    // Assign all Java system properties from
+    // the command line to the tests
+    systemProperties System.properties
+}
+
+clean {
+    doFirst {
+        exec {
+            executable = 'rm'
+            args = ['-rf', './docker']
+        }
+    }
+}
+
+task initDockerize(type: Copy, dependsOn: [build]) {
+    from './'
+    include 'Dockerfile'
+    include '*.properties'
+    into 'docker/'
+}
+
+task copyWAR(type: Copy, dependsOn: war) {
+    from 'build/libs/'
+    into 'docker/'
+    include '*.war'
+}
+
+task dockerize(type: Exec, dependsOn: [clean, initDockerize, copyWAR]) {
+    commandLine 'docker', 'build', '-t', project.docker_image_name, '-f', './docker/Dockerfile', './docker/'
+}
