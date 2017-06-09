@@ -1,5 +1,6 @@
 env:
   DOCKER_COMPOSE_VERSION: 1.13.0
+  REGISTRY_HOST: proxy.cadc.dao.nrc.ca
 language: java
 jdk:
 - oraclejdk8
@@ -19,7 +20,7 @@ script:
 - cd integrationTest
 - docker-compose up -d
 - docker ps -a
-- gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.local=true
+- gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST
   intTest
 after_success:
 - if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then docker login -u="$DOCKER_USERNAME"
