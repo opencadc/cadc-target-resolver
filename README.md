@@ -49,7 +49,7 @@ To start a proxy server and the resolver web application.
 Then in the working directory, run:
 
 ```
-gradle -i -Dca.nrc.cadc.reg.client.RegistryClient=<your registry host>
+gradle -i -Dca.nrc.cadc.reg.client.RegistryClient=<your registry host> intTest
 ```
 
 Where `<your registry host>` matches the one running the server above.
