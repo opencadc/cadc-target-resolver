@@ -1,4 +1,4 @@
-<%--
+<%@ page import="java.net.URL" %><%--
 ************************************************************************
 *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
 **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
@@ -69,7 +69,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <%
-  final String schemeServerName = "http://" + request.getServerName();
+  final String schemeServerName = "http://" + new URL(request.getRequestURL().toString()).getHost();
   final int requestServerPort = request.getServerPort();
   final int port = ((request.getScheme().equals("http") && (requestServerPort == 80))
                     || (request.getScheme().equals("https") && (requestServerPort == 443)))

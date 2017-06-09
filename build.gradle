@@ -16,7 +16,7 @@ repositories {
 
 sourceCompatibility = 1.7
 group = 'ca.nrc.cadc'
-version = '1002'
+version = '1003'
 
 war {
     archiveName = project.name + '##' + project.version + '.war'

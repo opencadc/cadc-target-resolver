@@ -222,7 +222,7 @@ class TargetResolverRequest
 
                 case "VIZIER":
                 {
-                    services.add(Service.VIZIER_CADC);
+//                    services.add(Service.VIZIER_CADC);
                     services.add(Service.VIZIER_CDS);
                     break;
                 }
