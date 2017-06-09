@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         id="target_resolver" version="3.0">
+
+  <display-name>CADC Target Resolver</display-name>
+
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+
+  <servlet>
+    <servlet-name>AvailabilityServlet</servlet-name>
+    <servlet-class>ca.nrc.cadc.vosi.AvailabilityServlet</servlet-class>
+    <init-param>
+      <description>
+      </description>
+      <param-name>ca.nrc.cadc.vosi.WebService</param-name>
+      <param-value>ca.nrc.cadc.nameresolver.ws.TargetResolverWebService</param-value>
+    </init-param>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+
+  <!-- CADC Name Resolver Servlet -->
+  <servlet>
+    <servlet-name>CADC Name Resolver</servlet-name>
+    <servlet-class>ca.nrc.cadc.nameresolver.NRServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>CapabilitiesServlet</servlet-name>
+    <servlet-class>ca.nrc.cadc.vosi.CapabilitiesServlet</servlet-class>
+    <init-param>
+      <param-name>input</param-name>
+      <param-value>/capabilities.xml</param-value>
+    </init-param>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+
+  <!-- cadcLog servlet -->
+  <servlet>
+    <servlet-name>logControl</servlet-name>
+    <servlet-class>ca.nrc.cadc.log.LogControlServlet</servlet-class>
+    <init-param>
+      <param-name>logLevel</param-name>
+      <param-value>info</param-value>
+    </init-param>
+    <init-param>
+      <param-name>logLevelPackages</param-name>
+      <param-value>
+        ca.nrc.cadc.nameresolver
+        ca.nrc.cadc.vosi
+      </param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <!-- URL-to-servlet mapping -->
+  <servlet-mapping>
+    <servlet-name>CADC Name Resolver</servlet-name>
+    <url-pattern>/find/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>CapabilitiesServlet</servlet-name>
+    <url-pattern>/capabilities</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>AvailabilityServlet</servlet-name>
+    <url-pattern>/availability</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>logControl</servlet-name>
+    <url-pattern>/logControl</url-pattern>
+  </servlet-mapping>
+
+</web-app>
