@@ -19,17 +19,14 @@ script:
 - cd integrationTest
 - docker-compose up -d
 - docker ps -a
-- gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca intTest
+- gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca
+  intTest
 after_success:
-- if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then
-    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-    docker push opencadc/cadc-target-resolver;
-  fi
-- if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then
-      echo "Not deploying.";
-  fi
+- if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then docker login -u="$DOCKER_USERNAME"
+  -p="$DOCKER_PASSWORD"; docker push opencadc/cadc-target-resolver; fi
+- if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then echo "Not deploying."; fi
 addons:
   hosts: proxy.cadc.dao.nrc.ca
 notifications:
   slack:
-    secure: FMzP6Yk5MNDz1dvR9YvAaQmdPM5ul7AEpzu8wpBrr2N2Qm6Yeok217WelMzRu4Zak7Pr65oCEMvpAE9TiWRNzuZvMsIB/h2TU+JlLtjAJx1hhX4ME5YaLgIOhaBNyNG64gTr9TTLYuTP0S/Zuy952hmL4hS1OBFSjU7E0xJH156NISb10tQfcoi/axWxSQSBfKnAiSt6KmNMbSwU+RTyRcq+665lIeW4Pj2QJaRDi7LcPUQZbV1iDKJ0mEjYxCS+Gvz+Su0jBHL+GTv1KvKh54I4cHTL1QpQADWkHcAFbPB+XX0jxid2GIJUtHj2j8bIRjAofILJDxh6tcuBARU0aCgRzHB5g3b4t4Y30bMZCkL6+eGg9uUNWGJUIno50AwsCoPLXFkEAdeGvxuVMXtCGylNDXf+KSeh7+1ZHzWEAqcOZYo6GEZbDceeRiM7DhflI7yX4lRHVI6SfaZ5cV1S6Q9iBS2yJbFdLLp63Y5NWtLTVS6FEZKt7qQZCNaM0mkljv7kpPiQZ6mqS+iqvdZBieFQ4C47goP/CrxXR5yYi1kNpg2AZAP08rhbFVAALC4GMAtyflwhuVhlCbaxS9uZOc9i8bHmnTr2NEIUHcUbezNhx/fDszv2BIrjh1hLMfnSfe+uf/5xmUsfPvHUL5IjGauPPJRGFMQGyjtl/6YsXg0=
+    secure: d3jO70JUI6UqNJrPuafkteYJkLZv04mMVCJryi4lgdY4tFo2UkyAEZVP9vpk4uk6RHVQw+og6ZNp3lIMa8UP03IMY2dpm6YqDzHZxt9C5N4SKFHg5kbLKgsxvzYSb7xEY7KlfXZHL4+c9q/IEYu77Nftdv8IzLYuZnXRGjjp3sUw+azxwsx7mn/+HaGN6tdqUePN9l/wC4ezSW3WkOkezsGR1RKcMUMcXg1KnM7sBPa7Qv8Y14F6alcDuKQSLYq+NzG1cq5yW+S8VGvlsRnKpx4qH6GlDLNqUUJRqYOrREuvAiIQsy+TURHRQElHRy4bwv1MZAtQByR+Uk9aWdlX5u2V7pCyhjqdJ80t4dVickzQ4pLODiMlmJIeWhHZIYgFvrKh4Q9Pn8WDa10Kqu0ngffjmZTe1pw8O6W3RS8M/9i5kMWTv0jKKwtUw4VWzqB4VPFt6KM5vCsCr1F6LS32kFhnqtGi1Z8efhUB2brDPw4XVEglKnEJK6RBc9dLMVkeJ+CyJ7rnOtgl7YldJaa/gJOXfKjTmYS/bs33oHFocUj97PjlQH8txhF4jQs74K1cQj3LuL7Cm7mrW/1a1pbM/0sJ1BZLVq7qaHZ3j6Yb8PEApraWdayA4TODXvF2UspEDqT4mMgNs97S4g8TqC5JPa3llXgN7OMLK3erdvdJsb0=
