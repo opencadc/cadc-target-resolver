@@ -4,7 +4,10 @@ FROM tomcat:8.5-alpine
 # -Dca.nrc.cadc.reg.client.RegistryClient.host=<your host for CANFAR registry entries>
 ENV JAVA_OPTS "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5555 -Djava.security.egd=file:/dev/./urandom -Djsse.enableSNIExtension=false"
 
-COPY TargetResolver.properties /root/config/
+# Uncomment this when we can configure it externally.
+#COPY TargetResolver.properties /root/config/
+
 COPY *.war webapps/
 
 EXPOSE 5555
+
