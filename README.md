@@ -1,5 +1,6 @@
 ---
 
+layout: default
 app.version: 1004
 
 ---
