@@ -1,6 +1,6 @@
 ---
 
-app.version: 1004
+app.version: 1005
 
 ---
 
@@ -31,15 +31,16 @@ You can build the WAR yourself with
 gradle clean build
 ```
 
-Then deploy the `build/libs/cadc-target-resolver##1004.war` to your existing Servlet Container.
+Then deploy the `build/libs/cadc-target-resolver##1005.war` to your existing Servlet Container.
 
 
 ## Integration tests
 
-In the `integrationTest` folder, you can run
+In the `integrationTest` folder:
 
 ```
 export REGISTRY_HOST=<your registry host>
+sed -i 's/@MYHOST@/'"${REGISTRY_HOST}"'/g' root/resource-caps.config
 docker-compose up -d
 ```
 
