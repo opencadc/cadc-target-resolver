@@ -1,4 +1,8 @@
-# cadc-target-resolver (Build 1004)
+---
+version: 1004
+---
+
+# cadc-target-resolver (Build ${page.data.version})
 Name resolving proxy that calls multiple target name resolvers.
 
 # Running
@@ -21,7 +25,7 @@ You can build the WAR yourself with
 gradle clean build
 ```
 
-Then deploy the `build/libs/cadc-target-resolver##1003.war` to your existing Servlet Container.
+Then deploy the `build/libs/cadc-target-resolver##1004.war` to your existing Servlet Container.
 
 
 ## Integration tests
