@@ -41,4 +41,4 @@ Then in the working directory, run:
 gradle -i -Dca.nrc.cadc.reg.client.RegistryClient=<your registry host>
 ```
 
-Where `<your registry host` matches the one running the server above.
+Where `<your registry host>` matches the one running the server above.
