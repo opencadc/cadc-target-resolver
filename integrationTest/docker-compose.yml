@@ -7,8 +7,6 @@ services:
       - '5555:5555'
     networks:
       - 'resolver'
-    volumes:
-      - './webapps:/usr/local/tomcat/webapps'
     environment:
       - CATALINA_OPTS=-Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST
   proxy.cadc.dao.nrc.ca:
