@@ -89,8 +89,7 @@ public enum Service
                                                 + "&obj.bibsel=off&list.bibsel=off&obj.messel=off&obj.notesel=off"
                                                 + "&Ident=", "Connection: close HTTP/1.1\r\n\r\n", false),
 
-    // Queries the VizieR services at CADC.
-    //
+    // Queries the VizieR services at CADC. ** Removing this with s2147
     // VIZIER_CADC("vizier", "vizier.hia.nrc.ca", 80, "/cgi-bin/nph-sesame/-o/V?", "HTTP/1.0\r\n\r\n", true),
 
     // Queries the VizieR services at CDS.
