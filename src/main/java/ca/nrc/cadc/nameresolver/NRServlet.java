@@ -71,6 +71,7 @@ package ca.nrc.cadc.nameresolver;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.SelectionKey;
@@ -677,7 +678,7 @@ public class NRServlet extends HttpServlet
             else
             {
                 final Service service = Service.valueOfFromHost(host);
-                channel.write(encoder.encode(CharBuffer.wrap(service.getConnectString(target))));
+                channel.write(encoder.encode(CharBuffer.wrap(service.getConnectString(URLEncoder.encode(target,"UTF-8")))));
                 log.debug("  connected channel: " + host);
             }
             channel.register(selector, SelectionKey.OP_READ);
