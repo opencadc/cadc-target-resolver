@@ -1,6 +1,6 @@
 ---
 
-app.version: 1005
+app.version: 1006
 
 ---
 
@@ -31,7 +31,7 @@ You can build the WAR yourself with
 gradle clean build
 ```
 
-Then deploy the `build/libs/cadc-target-resolver##1005.war` to your existing Servlet Container.
+Then deploy the `build/libs/cadc-target-resolver##1006.war` to your existing Servlet Container.
 
 
 ## Integration tests
