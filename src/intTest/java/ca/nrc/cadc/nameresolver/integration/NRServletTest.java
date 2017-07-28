@@ -246,9 +246,9 @@ public class NRServletTest
         final String otype = "G";
         final String mtype = null;
 
-        validateASCII("target=" + NetUtil.encode(target) + "&service=ned", target, ra, dec, null, null, null, false);
-        validateASCII("target=" + NetUtil.encode(target) + "&service=ned&detail=min", target, ra, dec, null, null, null, false);
-        validateASCII("target=" + NetUtil.encode(target) + "&service=ned&detail=max", target, ra, dec, oname, otype, mtype, true);
+        validateASCII("target=" + NetUtil.encode(target) + "&service=ned", "m31", ra, dec, null, null, null, false);
+        validateASCII("target=" + NetUtil.encode(target) + "&service=ned&detail=min", "m31", ra, dec, null, null, null, false);
+        validateASCII("target=" + NetUtil.encode(target) + "&service=ned&detail=max", "m31", ra, dec, oname, otype, mtype, true);
     }
 
     @Test
