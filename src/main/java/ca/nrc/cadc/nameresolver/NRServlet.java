@@ -258,9 +258,9 @@ public class NRServlet extends HttpServlet
     /**
      * Perform a query of the requested services for the requested target.
      *
-     * @param targetResolverRequest         The request object.
-     * @return      TargetData instance, or null if none found after exhaustive attempt.
-     * @throws IOException      If the Java NIO Channel failed.
+     * @param targetResolverRequest The request object.
+     * @return TargetData instance, or null if none found after exhaustive attempt.
+     * @throws IOException If the Java NIO Channel failed.
      */
     TargetData exhaustiveLookup(final TargetResolverRequest targetResolverRequest) throws IOException
     {
@@ -291,9 +291,10 @@ public class NRServlet extends HttpServlet
 
     /**
      * Call upon the service to query the request.
-     * @param targetResolverRequest         The request.
-     * @return      TargetData instance, or null if none found.
-     * @throws IOException      If the Java NIO Channel failed.
+     *
+     * @param targetResolverRequest The request.
+     * @return TargetData instance, or null if none found.
+     * @throws IOException If the Java NIO Channel failed.
      */
     TargetData tryLookup(final TargetResolverRequest targetResolverRequest) throws IOException
     {
@@ -377,7 +378,7 @@ public class NRServlet extends HttpServlet
      * Construct and start the service queries to resolve the target.
      * Returns the results from the first database that has successfully resolved the target,
      * or null if the target was not resolved.
-     *
+     * <p>
      * Allow tests to override.
      *
      * @param selector the selector
@@ -530,12 +531,12 @@ public class NRServlet extends HttpServlet
 
     /**
      * Create a socket channel with the given host and register connect interest with the selector.
-     *
+     * <p>
      * Override for tests to not actually make a request out.
      *
      * @param selector the selector
      * @param host     the host name
-     * @param port      The port number.
+     * @param port     The port number.
      */
     void createChannel(Selector selector, String host, final int port)
     {
@@ -560,7 +561,7 @@ public class NRServlet extends HttpServlet
 
     /**
      * Create a socket channel with the given host and register connect interest with the selector.
-     *
+     * <p>
      * Override for tests to not actually make a request out.
      *
      * @param selector the selector
@@ -678,7 +679,8 @@ public class NRServlet extends HttpServlet
             else
             {
                 final Service service = Service.valueOfFromHost(host);
-                channel.write(encoder.encode(CharBuffer.wrap(service.getConnectString(URLEncoder.encode(target,"UTF-8")))));
+                channel.write(encoder.encode(CharBuffer.wrap(service.getConnectString(URLEncoder
+                                                                                              .encode(target, "UTF-8")))));
                 log.debug("  connected channel: " + host);
             }
             channel.register(selector, SelectionKey.OP_READ);
@@ -753,16 +755,16 @@ public class NRServlet extends HttpServlet
      */
     private static void logHostError(final String host, final int statusCode)
     {
-        String sb = Calendar.getInstance().getTime().toString() +
-                    " ***NameResolver*** " +
-                    "Error connecting to host " +
-                    host +
-                    ", http status code " +
-                    statusCode;
-
-        log.error(sb);
+        log.error(Calendar.getInstance().getTime().toString() +
+                  " *** cadc-target-resolver *** " + "Error connecting to host " + host + ", http status code "
+                  + statusCode);
     }
 
+    /**
+     * Factory style to obtain a writer implementation.
+     * @param format        The Format instance.
+     * @return              TargetDataWriter implementation (Default ASCII).
+     */
     private TargetDataWriter getWriter(final Format format)
     {
         switch (format)
@@ -770,6 +772,11 @@ public class NRServlet extends HttpServlet
             case JSON:
             {
                 return new TargetDataJSONWriter();
+            }
+
+            case XML:
+            {
+                return new TargetDataXMLWriter();
             }
 
             default:

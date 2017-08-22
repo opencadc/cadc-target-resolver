@@ -68,16 +68,59 @@
 
 package ca.nrc.cadc.nameresolver;
 
-enum Format
+import org.junit.Test;
+import static org.junit.Assert.*;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.Diff;
+
+import java.io.StringWriter;
+import java.io.Writer;
+
+
+public class TargetDataXMLWriterTest extends AbstractTargetDataWriterTest<TargetDataXMLWriter>
 {
-    ASCII("text/plain"), JSON("application/json"), XML("text/xml");
-
-
-    final String contentType;
-
-
-    Format(String contentType)
+    @Test
+    public void write() throws Exception
     {
-        this.contentType = contentType;
+        testSubject = new TargetDataXMLWriter();
+        final Writer writer = new StringWriter();
+
+        testSubject.write(TEST_TARGET_DATA, getTestTargetResolverRequest(), writer);
+
+        final String expected =
+                "<result><target>m88</target><service>ned(myhost.com)</service><coordsys>ICRS</coordsys><ra>88.0</ra><dec>99.0</dec><time>"
+                + TEST_TARGET_DATA.getQueryTime() + "</time></result>";
+
+        final Input.Builder expectedInput = Input.fromString(expected);
+        final Input.Builder resultOutput = Input.fromString(writer.toString());
+        final Diff diff = DiffBuilder.compare(expectedInput).withTest(resultOutput).ignoreWhitespace()
+                .ignoreComments().build();
+        assertFalse(diff.toString(), diff.hasDifferences());
+    }
+
+    @Test
+    public void writeError() throws Exception
+    {
+        testSubject = new TargetDataXMLWriter();
+        final Writer writer = new StringWriter();
+
+        testSubject.write(TEST_ERROR_TARGET_DATA, getTestTargetResolverRequest(), writer);
+
+        final String expected =
+                "<result><error>BAD ERROR</error><target>m88</target><service>ned(myhost.com)</service><coordsys>ICRS</coordsys><ra>88.0</ra><dec>99.0</dec><time>"
+                + TEST_ERROR_TARGET_DATA.getQueryTime() + "</time></result>";
+
+        final Input.Builder expectedInput = Input.fromString(expected);
+        final Input.Builder resultOutput = Input.fromString(writer.toString());
+        final Diff diff = DiffBuilder.compare(expectedInput).withTest(resultOutput).ignoreWhitespace()
+                .ignoreComments().build();
+        assertFalse(diff.toString(), diff.hasDifferences());
+    }
+
+    @Override
+    String getFormatName()
+    {
+        return Format.XML.name().toLowerCase();
     }
 }

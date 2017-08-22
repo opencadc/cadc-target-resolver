@@ -68,16 +68,57 @@
 
 package ca.nrc.cadc.nameresolver;
 
-enum Format
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.XMLOutputter;
+
+import java.io.Writer;
+
+
+public class TargetDataXMLWriter implements TargetDataWriter
 {
-    ASCII("text/plain"), JSON("application/json"), XML("text/xml");
+    private final String RESULT_ROOT = "result";
 
 
-    final String contentType;
-
-
-    Format(String contentType)
+    /**
+     * Write out the target data to the given writer.
+     *
+     * @param targetData The target data instance.
+     * @param request    The target request.
+     * @param writer     The writer instance.
+     * @throws Exception Any writing errors.
+     */
+    @Override
+    public void write(final TargetData targetData, final TargetResolverRequest request,
+                      final Writer writer) throws Exception
     {
-        this.contentType = contentType;
+        final Element root = new Element(RESULT_ROOT);
+
+        if (targetData.isError())
+        {
+            root.addContent(new Element(ERROR_KEY).setText(targetData.getErrorMessage()));
+        }
+
+        root.addContent(new Element(TARGET_KEY).setText(targetData.getTarget()));
+        root.addContent(new Element(SERVICE_KEY).setText(targetData.getDatabase() + "(" + targetData.getHost() + ")"));
+        root.addContent(new Element(COORDSYS_KEY).setText(targetData.getCoordsys()));
+        root.addContent(new Element(RA_KEY).setText(Double.toString(targetData.getRA())));
+        root.addContent(new Element(DEC_KEY).setText(Double.toString(targetData.getDEC())));
+
+        if (request.detail == Detail.MAX)
+        {
+            root.addContent(new Element(ONAME_KEY ).setText((targetData.getObjectName() != null)
+                                                            ? targetData.getObjectName() : ""));
+            root.addContent(new Element(OTYPE_KEY ).setText((targetData.getObjectType() != null)
+                                                            ? targetData.getObjectType() : ""));
+            root.addContent(new Element(MTYPE_KEY ).setText((targetData.getMorphologyType() != null)
+                                                            ? targetData.getMorphologyType() : ""));
+        }
+
+        root.addContent(new Element(TIME_KEY).setText(Long.toString(targetData.getQueryTime())));
+
+        final XMLOutputter xmlOutputter = new XMLOutputter();
+        xmlOutputter.setFormat(org.jdom2.output.Format.getPrettyFormat());
+        xmlOutputter.output(new Document(root), writer);
     }
 }

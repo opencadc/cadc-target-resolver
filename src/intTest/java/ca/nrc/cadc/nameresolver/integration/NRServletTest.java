@@ -79,7 +79,11 @@ import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -102,6 +106,7 @@ public class NRServletTest
 
     private static final String APPLICATION_JSON = "application/json";
     private static final String TEXT_PLAIN = "text/plain";
+    private static final String TEXT_XML = "text/xml";
     private static final String TARGET = "target";
     private static final String COORDSYS = "coordsys";
     private static final String RA = "ra";
@@ -247,8 +252,10 @@ public class NRServletTest
         final String mtype = null;
 
         validateASCII("target=" + NetUtil.encode(target) + "&service=ned", "m31", ra, dec, null, null, null, false);
-        validateASCII("target=" + NetUtil.encode(target) + "&service=ned&detail=min", "m31", ra, dec, null, null, null, false);
-        validateASCII("target=" + NetUtil.encode(target) + "&service=ned&detail=max", "m31", ra, dec, oname, otype, mtype, true);
+        validateASCII("target=" + NetUtil
+                .encode(target) + "&service=ned&detail=min", "m31", ra, dec, null, null, null, false);
+        validateASCII("target=" + NetUtil
+                .encode(target) + "&service=ned&detail=max", "m31", ra, dec, oname, otype, mtype, true);
     }
 
     @Test
@@ -277,9 +284,12 @@ public class NRServletTest
         final String otype = "G";
         final String mtype = "SA(s)b";
 
-        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad", expected, ra, dec, null, null, null, false);
-        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad&detail=min", expected, ra, dec, null, null, null, false);
-        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad&detail=max", expected, ra, dec, oname, otype, mtype, true);
+        validateASCII("target=" + NetUtil
+                .encode(target) + "&service=simbad", expected, ra, dec, null, null, null, false);
+        validateASCII("target=" + NetUtil
+                .encode(target) + "&service=simbad&detail=min", expected, ra, dec, null, null, null, false);
+        validateASCII("target=" + NetUtil
+                .encode(target) + "&service=simbad&detail=max", expected, ra, dec, oname, otype, mtype, true);
     }
 
     @Test
@@ -294,8 +304,10 @@ public class NRServletTest
         final String mtype = null;
 
         validateASCII("target=" + NetUtil.encode(target) + "&service=vizier", target, ra, dec, null, null, null, false);
-        validateASCII("target=" + NetUtil.encode(target) + "&service=vizier&detail=min", target, ra, dec, null, null, null, false);
-        validateASCII("target=" + NetUtil.encode(target) + "&service=vizier&detail=max", target, ra, dec, oname, otype, mtype, true);
+        validateASCII("target=" + NetUtil
+                .encode(target) + "&service=vizier&detail=min", target, ra, dec, null, null, null, false);
+        validateASCII("target=" + NetUtil
+                .encode(target) + "&service=vizier&detail=max", target, ra, dec, oname, otype, mtype, true);
     }
 
     @Test
@@ -378,11 +390,100 @@ public class NRServletTest
         final String mtype = null;
 
         validateJSON("target=" + NetUtil.encode(target) + "&format=json&service=vizier", target, ra, dec, null,
-                    null, null, false);
+                     null, null, false);
         validateJSON("target=" + NetUtil.encode(target) + "&format=json&service=vizier&detail=min", target, ra, dec,
-                    null, null, null, false);
-        validateJSON("target=" + NetUtil.encode(target) + "&format=json&service=vizier&detail=max", target, ra, dec, oname,
-                    otype, mtype, true);
+                     null, null, null, false);
+        validateJSON("target=" + NetUtil
+                             .encode(target) + "&format=json&service=vizier&detail=max", target, ra, dec, oname,
+                     otype, mtype, true);
+    }
+
+    @Test
+    public void testXMLResults() throws Exception
+    {
+        final String target = "m31";
+        final double ra = 10.68479d;
+        final double dec = 41.26906d;
+        final String oname = "MESSIER 031";
+        final String otype = "G";
+        final String mtype = null;
+
+        validateXML("target=m31&format=xml", target, ra, dec, null, null, null,
+                     false);
+        validateXML("target=m31&detail=min&format=xml", target, ra, dec, null, null, null,
+                     false);
+        validateXML("target=m31&detail=max&format=xml", target, ra, dec, oname, otype, mtype, true);
+    }
+
+    @Test
+    public void testXMLResultsAll() throws Exception
+    {
+        final String target = "m31";
+        final double ra = 10.68479d;
+        final double dec = 41.26906d;
+        final String oname = "MESSIER 031";
+        final String otype = "G";
+        final String mtype = null;
+
+        validateXML("target=m31&format=xml&service=all", target, ra, dec, null, null, null,
+                     false);
+        validateXML("target=m31&detail=min&format=xml&service=all", target, ra, dec, null, null,
+                     null, false);
+        validateXML("target=m31&detail=max&format=xml&service=all", target, ra, dec, oname, otype, mtype,
+                     true);
+    }
+
+    @Test
+    public void testXMLResultsNED() throws Exception
+    {
+        final String target = "m31";
+        final double ra = 10.68479d;
+        final double dec = 41.26906d;
+        final String oname = "MESSIER 031";
+        final String otype = "G";
+        final String mtype = null;
+
+        validateXML("target=m31&format=xml&service=ned", target, ra, dec, null, null, null,
+                     false);
+        validateXML("target=m31&detail=min&format=xml&service=ned", target, ra, dec, null, null,
+                     null, false);
+        validateXML("target=m31&detail=max&format=xml&service=ned", target, ra, dec, oname, otype, mtype,
+                     true);
+    }
+
+    @Test
+    public void testXMLResultsSimbad() throws Exception
+    {
+        final String target = "m31";
+        final double ra = 10.684708d;
+        final double dec = 41.26875d;
+        final String oname = "M 31";
+        final String otype = "G";
+        final String mtype = "SA(s)b";
+
+        validateXML("target=m31&format=xml&service=simbad", target, ra, dec, null, null, null, false);
+        validateXML("target=m31&format=xml&service=simbad&detail=min", target, ra, dec, null, null, null, false);
+        validateXML("target=m31&format=xml&service=simbad&detail=max", target, ra, dec, oname, otype, mtype, true);
+    }
+
+    @Test
+    @Ignore("Vizier is extremely unpredictable.")
+    public void testXMLResultsVizier() throws Exception
+    {
+        final String target = "NGC 4321";
+        final double ra = 185.74d;
+        final double dec = 15.83d;
+        final String oname = null;
+        final String otype = null;
+        final String mtype = null;
+
+        validateXML("target=" + NetUtil.encode(target) + "&format=xml&service=vizier", target, ra, dec, null,
+                     null, null, false);
+        validateXML("target=" + NetUtil.encode(target) + "&format=xml&service=vizier&detail=min", target, ra, dec,
+                     null, null, null, false);
+        validateXML("target=" + NetUtil
+                             .encode(target) + "&format=xml&service=vizier&detail=max", target, ra, dec, oname,
+                     otype, mtype, true);
     }
 
     private void validateASCII(final String query, final String target, final double ra, final double dec,
@@ -488,5 +589,62 @@ public class NRServletTest
                 assertEquals("mtype does not match", mtype, resultsJSON.getString(MTYPE));
             }
         }
+    }
+
+    private void validateXML(final String query, final String target, final double ra, final double dec,
+                             final String oname, final String otype, final String mtype, final boolean maxDetail)
+            throws Exception
+    {
+        final HttpURLConnection conn = openConnection(query);
+        conn.setRequestMethod("GET");
+        assertEquals("wrong response code", 200, conn.getResponseCode());
+        assertTrue("wrong content type >> " + conn.getURL().toExternalForm(),
+                   conn.getHeaderField("content-type").contains(TEXT_XML));
+
+        final Document document =
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(conn.getInputStream());
+        final Element root = document.getDocumentElement();
+
+        assertEquals("target does not match", NetUtil.encode(target), getText("target", root));
+        assertEquals("coordsys does not match", ICRS, getText("coordsys", root));
+        assertEquals("ra does not match", ra, new Double(getText("ra", root)), 1.0);
+        assertEquals("dec does not match", dec, new Double(getText("dec", root)), 1.0);
+
+        if (maxDetail)
+        {
+            if (oname == null)
+            {
+                assertEquals("oname does not match", "", getText(ONAME, root));
+            }
+            else
+            {
+                assertEquals("oname does not match", oname, getText(ONAME, root));
+            }
+
+            if (otype == null)
+            {
+                assertEquals("otype does not match", "", getText(OTYPE, root));
+            }
+            else
+            {
+                assertEquals("otype does not match", otype, getText(OTYPE, root));
+            }
+
+            if (mtype == null)
+            {
+                assertEquals("mtype does not match", "", getText(MTYPE, root));
+            }
+            else
+            {
+                assertEquals("mtype does not match", mtype, getText(MTYPE, root));
+            }
+        }
+    }
+
+    private String getText(final String tagName, final Element element) throws Exception
+    {
+        final NodeList nodeList = element.getElementsByTagName(tagName);
+
+        return (nodeList.getLength() > 0 ? nodeList.item(0).getTextContent() : "");
     }
 }
