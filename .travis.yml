@@ -23,6 +23,7 @@ script:
 - docker ps -a
 - gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST
   intTest
+- cd ../
 after_success:
 - if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then docker login -u="$DOCKER_USERNAME"
   -p="$DOCKER_PASSWORD"; docker push opencadc/cadc-target-resolver; fi
