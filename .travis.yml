@@ -1,5 +1,5 @@
 env:
-  DOCKER_COMPOSE_VERSION: 1.14.0
+  DOCKER_COMPOSE_VERSION: 1.15.0
   REGISTRY_HOST: proxy.cadc.dao.nrc.ca
 language: java
 jdk:
@@ -23,9 +23,10 @@ script:
 - docker ps -a
 - gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST
   intTest
+- cd ../
 after_success:
-- if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then docker login -u="$DOCKER_USERNAME"
-  -p="$DOCKER_PASSWORD"; docker push opencadc/cadc-target-resolver; fi
+- if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then docker login -u "$DOCKER_USERNAME"
+  -p "$DOCKER_PASSWORD"; docker push opencadc/cadc-target-resolver; fi
 - if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then echo "Not deploying."; fi
 addons:
   hosts: proxy.cadc.dao.nrc.ca
