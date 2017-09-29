@@ -124,7 +124,7 @@ public class NRServlet extends HttpServlet
     private static final int DEFAULT_TARGET_CACHE_SIZE = 1000;
     private static final int DEFAULT_SELECTOR_TIMEOUT = 1000;
     private static final String TARGET_NOT_FOUND = "Target not found";
-    private static final Pattern RADIUS_SEARCH_PATTERN = Pattern.compile("(\\w*).*,?\\s*\\d+");
+    private static final Pattern RADIUS_SEARCH_PATTERN = Pattern.compile("(\\w*).*,?\\s+\\d+");
 
     private final Map<String, TargetData> targetCache = new HashMap<>(DEFAULT_TARGET_CACHE_SIZE);
     private Charset charset;
@@ -196,7 +196,10 @@ public class NRServlet extends HttpServlet
                 targetData = exhaustiveLookup(targetResolverRequest);
             }
 
-            // no results, return 425 response code
+            // No results found.
+
+            response.setContentType(targetResolverRequest.format.contentType);
+
             if (targetData == null)
             {
                 message = TARGET_NOT_FOUND;
@@ -206,7 +209,6 @@ public class NRServlet extends HttpServlet
 
                 logInfo.setMessage(message);
                 logInfo.setSuccess(false);
-                response.setStatus(NAME_RESOLVER_HTTP_ERROR_CODE);
                 targetDataWriter.write(targetData, targetResolverRequest, response.getWriter());
             }
             else
@@ -216,7 +218,6 @@ public class NRServlet extends HttpServlet
                 long time = System.currentTimeMillis() - start;
                 targetData.setQueryTime(time);
 
-                response.setContentType(targetResolverRequest.format.contentType);
                 targetDataWriter.write(targetData, targetResolverRequest, response.getWriter());
 
                 logInfo.setMessage(targetData.toString());
@@ -438,6 +439,9 @@ public class NRServlet extends HttpServlet
                                 HttpHeaderParser headerParser = new HttpHeaderParser(data.toString());
                                 int responseCode = headerParser.getResponseCode();
 
+                                log.debug(String.format("Got Response code %d from %s (%s)", responseCode, currentHost,
+                                                        service.name()));
+
                                 // 200 returned, process the data
                                 if (responseCode == HttpServletResponse.SC_OK)
                                 {
@@ -502,6 +506,10 @@ public class NRServlet extends HttpServlet
                                 data.setLength(0);
                                 currentHost = null;
                             }
+                        }
+                        else
+                        {
+                            log.debug(String.format("Host does not match current host (%s != %s)", host, currentHost));
                         }
                     }
                 }
@@ -679,9 +687,9 @@ public class NRServlet extends HttpServlet
             else
             {
                 final Service service = Service.valueOfFromHost(host);
-                channel.write(encoder.encode(CharBuffer.wrap(service.getConnectString(URLEncoder
-                                                                                              .encode(target, "UTF-8")))));
-                log.debug("  connected channel: " + host);
+                final String connectString = service.getConnectString(target);
+                channel.write(encoder.encode(CharBuffer.wrap(connectString)));
+                log.debug(String.format("Connecting to '%s' with '%s'", host, connectString));
             }
             channel.register(selector, SelectionKey.OP_READ);
         }
@@ -762,8 +770,9 @@ public class NRServlet extends HttpServlet
 
     /**
      * Factory style to obtain a writer implementation.
-     * @param format        The Format instance.
-     * @return              TargetDataWriter implementation (Default ASCII).
+     *
+     * @param format The Format instance.
+     * @return TargetDataWriter implementation (Default ASCII).
      */
     private TargetDataWriter getWriter(final Format format)
     {
