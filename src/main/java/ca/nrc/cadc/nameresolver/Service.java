@@ -71,25 +71,24 @@ package ca.nrc.cadc.nameresolver;
 
 import ca.nrc.cadc.net.NetUtil;
 
-public enum Service
-{
+public enum Service {
     // Queries the NED service at CalTech.
     NED("ned", "ned.ipac.caltech.edu", 80, "/cgi-bin/nph-objsearch?"
-                                           + "extend=no&out_csys=Equatorial"
-                                           + "&out_equinox=J2000.0&obj_sort=RA+or+Longitude"
-                                           + "&of=xml_main&zv_breaker=30000.0"
-                                           + "&list_limit=1&img_stamp=NO"
-                                           + "&objname=", "HTTP/1.0\r\n\r\n", false),
+        + "extend=no&out_csys=Equatorial"
+        + "&out_equinox=J2000.0&obj_sort=RA+or+Longitude"
+        + "&of=xml_main&zv_breaker=30000.0"
+        + "&list_limit=1&img_stamp=NO"
+        + "&objname=", "HTTP/1.0\r\n\r\n", false),
 
     // Queries the SIMBAD service at CDS.
     SIMBAD("simbad", "simbad.u-strasbg.fr", 80, "/simbad/sim-id?"
-                                                + "output.max=1&output.format=ASCII"
-                                                + "&obj.coo1=on&obj.coo2=off&obj.coo3=off&obj.coo4=off"
-                                                + "&frame1=ICRS&epoch1=J2000&coodisp1=d"
-                                                + "&obj.pmsel=off&obj.plxsel=off&obj.rvsel=off&obj.spsel=off"
-                                                + "&obj.mtsel=on&obj.sizesel=off&obj.fluxsel=off&list.idsel=off"
-                                                + "&obj.bibsel=off&list.bibsel=off&obj.messel=off&obj.notesel=off"
-                                                + "&Ident=", "HTTP/1.0\r\n\r\n", false),
+        + "output.max=1&output.format=ASCII"
+        + "&obj.coo1=on&obj.coo2=off&obj.coo3=off&obj.coo4=off"
+        + "&frame1=ICRS&epoch1=J2000&coodisp1=d"
+        + "&obj.pmsel=off&obj.plxsel=off&obj.rvsel=off&obj.spsel=off"
+        + "&obj.mtsel=on&obj.sizesel=off&obj.fluxsel=off&list.idsel=off"
+        + "&obj.bibsel=off&list.bibsel=off&obj.messel=off&obj.notesel=off"
+        + "&Ident=", "HTTP/1.0\r\n\r\n", false),
 
     // Queries the VizieR services at CADC. ** Removing this with s2147
     // VIZIER_CADC("vizier", "vizier.hia.nrc.ca", 80, "/cgi-bin/nph-sesame/-o/V?", "HTTP/1.0\r\n\r\n", true),
@@ -112,8 +111,7 @@ public enum Service
 
 
     Service(final String commonName, final String host, int port, final String parameters, final String extraInfo,
-            final boolean caseSensitiveFlag)
-    {
+            final boolean caseSensitiveFlag) {
         this.commonName = commonName;
         this.host = host;
         this.port = port;
@@ -122,33 +120,26 @@ public enum Service
         this.caseSensitiveFlag = caseSensitiveFlag;
     }
 
-    public String getCommonName()
-    {
+    public String getCommonName() {
         return commonName;
     }
 
-    public String getHost()
-    {
+    public String getHost() {
         return host;
     }
 
-    public int getPort()
-    {
+    public int getPort() {
         return port;
     }
 
-    public String getConnectString(final String target)
-    {
+    public String getConnectString(final String target) {
         return "GET " + parameters + NetUtil.encode(caseSensitiveFlag ? target : target.toLowerCase())
-               + " " + String.format(extraInfo, host);
+            + " " + String.format(extraInfo, host);
     }
 
-    public static Service valueOfFromHost(final String host)
-    {
-        for (final Service service : values())
-        {
-            if (service.getHost().equals(host))
-            {
+    public static Service valueOfFromHost(final String host) {
+        for (final Service service : values()) {
+            if (service.getHost().equals(host)) {
                 return service;
             }
         }

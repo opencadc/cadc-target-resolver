@@ -75,9 +75,8 @@ import org.jdom2.output.XMLOutputter;
 import java.io.Writer;
 
 
-public class TargetDataXMLWriter implements TargetDataWriter
-{
-    private final String RESULT_ROOT = "result";
+public class TargetDataXMLWriter implements TargetDataWriter {
+    private static final String RESULT_ROOT = "result";
 
 
     /**
@@ -90,12 +89,10 @@ public class TargetDataXMLWriter implements TargetDataWriter
      */
     @Override
     public void write(final TargetData targetData, final TargetResolverRequest request,
-                      final Writer writer) throws Exception
-    {
+                      final Writer writer) throws Exception {
         final Element root = new Element(RESULT_ROOT);
 
-        if (targetData.isError())
-        {
+        if (targetData.isError()) {
             root.addContent(new Element(ERROR_KEY).setText(targetData.getErrorMessage()));
         }
 
@@ -105,14 +102,13 @@ public class TargetDataXMLWriter implements TargetDataWriter
         root.addContent(new Element(RA_KEY).setText(Double.toString(targetData.getRA())));
         root.addContent(new Element(DEC_KEY).setText(Double.toString(targetData.getDEC())));
 
-        if (request.detail == Detail.MAX)
-        {
-            root.addContent(new Element(ONAME_KEY ).setText((targetData.getObjectName() != null)
-                                                            ? targetData.getObjectName() : ""));
-            root.addContent(new Element(OTYPE_KEY ).setText((targetData.getObjectType() != null)
-                                                            ? targetData.getObjectType() : ""));
-            root.addContent(new Element(MTYPE_KEY ).setText((targetData.getMorphologyType() != null)
-                                                            ? targetData.getMorphologyType() : ""));
+        if (request.detail == Detail.MAX) {
+            root.addContent(new Element(ONAME_KEY).setText((targetData.getObjectName() != null)
+                                                               ? targetData.getObjectName() : ""));
+            root.addContent(new Element(OTYPE_KEY).setText((targetData.getObjectType() != null)
+                                                               ? targetData.getObjectType() : ""));
+            root.addContent(new Element(MTYPE_KEY).setText((targetData.getMorphologyType() != null)
+                                                               ? targetData.getMorphologyType() : ""));
         }
 
         root.addContent(new Element(TIME_KEY).setText(Long.toString(targetData.getQueryTime())));

@@ -69,46 +69,38 @@
 package ca.nrc.cadc.nameresolver.parser;
 
 /**
- *
  * @author jburke
  */
-public abstract class DefaultParser
-{
+public abstract class DefaultParser {
     private final String target;
     private final String host;
     private final String results;
     private String database;
-    
-    DefaultParser(final String target, final String host, final String database, final String results)
-    {
+
+    DefaultParser(final String target, final String host, final String database, final String results) {
         this.target = target;
         this.host = host;
         this.database = database;
         this.results = results;
     }
-    
-    protected String getTarget()
-    {
+
+    protected String getTarget() {
         return target;
     }
-    
-    protected String getHost()
-    {
+
+    protected String getHost() {
         return host;
     }
-    
-    protected String getDatabase()
-    {
+
+    protected String getDatabase() {
         return database;
     }
-    
-    protected String getResults()
-    {
+
+    protected String getResults() {
         return results;
     }
-    
-    protected void setDatabase(final String database)
-    {
+
+    protected void setDatabase(final String database) {
         this.database = database;
     }
 

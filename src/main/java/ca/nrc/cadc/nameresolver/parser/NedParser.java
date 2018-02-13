@@ -90,8 +90,7 @@ import org.apache.log4j.Logger;
  *
  * @author jburke
  */
-public class NedParser extends DefaultParser implements Parser
-{
+public class NedParser extends DefaultParser implements Parser {
     private final static Logger log = Logger.getLogger(NedParser.class);
 
     private static final String RA_FIELD_NAME = "RA(deg)";
@@ -107,79 +106,66 @@ public class NedParser extends DefaultParser implements Parser
      * @param host    the host name.
      * @param results the resolver results to parse.
      */
-    public NedParser(String target, String host, String results)
-    {
+    public NedParser(String target, String host, String results) {
         super(target, host, "NED", results);
     }
 
-    public TargetData parse() throws TargetDataParsingException
-    {
+    public TargetData parse() throws TargetDataParsingException {
         // Find the start of the XML data
         String results = getResults();
         int index = results.indexOf("<?xml");
-        if (index == -1)
-        {
+        if (index == -1) {
             throw new TargetDataParsingException("VOTABLE not found in " + results);
         }
 
-        VOTableReader reader = new VOTableReader(false);
-        VOTableDocument votable;
-        try
-        {
+        final VOTableReader reader = new VOTableReader(false);
+        final VOTableDocument votable;
+        try {
             votable = reader.read(results.substring(index));
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             final String message = "error reading NED VOTABLE because " + e.getMessage();
             throw new TargetDataParsingException(message);
         }
 
         List<VOTableResource> resources = votable.getResources();
-        if (resources.isEmpty())
-        {
+        if (resources.isEmpty()) {
             final String message = "NED VOTable does not contain a resource element";
             log.debug(message + "\n" + getResults());
             throw new TargetDataParsingException(message);
         }
 
-        VOTableResource resource = resources.get(0);
+        final VOTableResource resource = resources.get(0);
 
-        for (VOTableParam param : resource.getParams())
-        {
-            if (param.getName().equalsIgnoreCase("error"))
-            {
+        for (VOTableParam param : resource.getParams()) {
+            if (param.getName().equalsIgnoreCase("error")) {
                 log.debug("Target not found in " + getDatabase());
                 return null;
             }
         }
 
         VOTableTable table = resource.getTable();
-        if (table == null)
-        {
+        if (table == null) {
             final String message = "NED VOTable resource table not found";
             log.debug(message + "\n" + getResults());
             throw new TargetDataParsingException(message);
         }
 
         TableData tableData = table.getTableData();
-        if (tableData == null)
-        {
+        if (tableData == null) {
             final String message = "Parsing error, NED VOTable table data not found";
             log.debug(message + "\n" + getResults());
             throw new TargetDataParsingException(message);
         }
 
         List<VOTableField> fields = table.getFields();
-        if (fields.isEmpty())
-        {
+        if (fields.isEmpty()) {
             final String message = "Parsing error, NED VOTable data fields not found";
             log.debug(message + "\n" + getResults());
             throw new TargetDataParsingException(message);
         }
 
         Iterator<List<Object>> iterator = tableData.iterator();
-        if (!iterator.hasNext())
-        {
+        if (!iterator.hasNext()) {
             final String message = "Parsing error, NED VOTable data is empty";
             log.debug(message + "\n" + getResults());
             throw new TargetDataParsingException(message);
@@ -191,38 +177,26 @@ public class NedParser extends DefaultParser implements Parser
         String oname = null;
         String otype = null;
         List<Object> data = iterator.next();
-        for (int i = 0; i < fields.size(); i++)
-        {
-            VOTableField field = fields.get(i);
-            try
-            {
-                Object value = data.get(i);
-                if (RA_FIELD_NAME.equals(field.getName()))
-                {
+        for (int i = 0; i < fields.size(); i++) {
+            final VOTableField field = fields.get(i);
+            try {
+                final Object value = data.get(i);
+                if (RA_FIELD_NAME.equals(field.getName())) {
                     ra = (Double) value;
-                }
-                if (DEC_FIELD_NAME.equals(field.getName()))
-                {
+                } else if (DEC_FIELD_NAME.equals(field.getName())) {
                     dec = (Double) value;
-                }
-                if (NAME_FIELD_NAME.equals(field.getName()))
-                {
+                } else if (NAME_FIELD_NAME.equals(field.getName())) {
                     oname = (String) value;
-                }
-                if (TYPE_FIELD_NAME.equals(field.getName()))
-                {
+                } else if (TYPE_FIELD_NAME.equals(field.getName())) {
                     otype = (String) value;
                 }
-            }
-            catch (NumberFormatException nfe)
-            {
+            } catch (NumberFormatException nfe) {
                 final String message = "NED number format exception: " + nfe.getMessage();
                 log.debug(message + "\n" + getResults());
                 throw new TargetDataParsingException(message);
             }
         }
-        if (ra != null && dec != null)
-        {
+        if (ra != null && dec != null) {
             targetData = new TargetData(getTarget(), getHost(), getDatabase(), ra, dec, oname, otype, null);
         }
         return targetData;

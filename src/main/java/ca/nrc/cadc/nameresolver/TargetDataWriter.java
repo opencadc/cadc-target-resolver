@@ -65,6 +65,7 @@
  *
  ************************************************************************
  */
+
 package ca.nrc.cadc.nameresolver;
 
 import java.io.Writer;
@@ -72,8 +73,7 @@ import java.io.Writer;
 /**
  * Output the target data.
  */
-public interface TargetDataWriter
-{
+public interface TargetDataWriter {
     String CRLF = "\r\n";
     String ERROR_KEY = "error";
     String TARGET_KEY = "target";
@@ -89,10 +89,11 @@ public interface TargetDataWriter
 
     /**
      * Write out the target data to the given writer.
-     * @param targetData        The target data instance.
-     * @param request           The target request.
-     * @param writer            The writer instance.
-     * @throws Exception        Any writing errors.
+     *
+     * @param targetData The target data instance.
+     * @param request    The target request.
+     * @param writer     The writer instance.
+     * @throws Exception Any writing errors.
      */
     void write(final TargetData targetData, final TargetResolverRequest request, final Writer writer) throws Exception;
 }

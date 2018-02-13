@@ -117,7 +117,7 @@ public class VosiCapabilitiesTest extends CapabilitiesTest
             Assert.assertNotNull(cap);
 
             // get the interface associated with the securityMethod
-            Interface intf = cap.findInterface(Standards.getSecurityMethod(AuthMethod.ANON));
+            Interface intf = cap.findInterface(Standards.getAuthMethod(Standards.SECURITY_METHOD_ANON));
             Assert.assertNotNull(intf);
 
             validateContent(caps);

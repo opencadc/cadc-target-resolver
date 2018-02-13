@@ -68,7 +68,6 @@
 
 package ca.nrc.cadc.nameresolver;
 
-enum Detail
-{
+enum Detail {
     MIN, MAX
 }

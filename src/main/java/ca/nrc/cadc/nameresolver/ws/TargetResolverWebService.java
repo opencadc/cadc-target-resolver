@@ -84,12 +84,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class TargetResolverWebService implements WebService
-{
+public class TargetResolverWebService implements WebService {
     private final Map<Service, String> testNameValues = new HashMap<>();
 
-    public TargetResolverWebService()
-    {
+    public TargetResolverWebService() {
         testNameValues.put(Service.NED, "m17");
         testNameValues.put(Service.SIMBAD, "M17");
         testNameValues.put(Service.VIZIER_CDS, NetUtil.encode("NGC 4321"));
@@ -98,45 +96,35 @@ public class TargetResolverWebService implements WebService
     }
 
     @Override
-    public AvailabilityStatus getStatus()
-    {
+    public AvailabilityStatus getStatus() {
         boolean isAvailable = false;
         StringBuilder note = new StringBuilder();
         final RegistryClient registryClient = new RegistryClient();
 
-        try
-        {
+        try {
             final URL baseURL = registryClient.getServiceURL(URI.create("ivo://cadc.nrc.ca/resolver"),
                                                              Standards.RESOLVER_10, AuthMethod.ANON);
 
-            for (final Service service : Service.values())
-            {
+            for (final Service service : Service.values()) {
                 final URL checkServiceURL = new URL(baseURL, "find?target=" + testNameValues.get(service)
-                                                             + "&format=json&service=" + service.getCommonName());
+                    + "&format=json&service=" + service.getCommonName());
                 final CheckURL checkURL = new CheckURL(service.name(), checkServiceURL, 200,
                                                        "application/json");
                 note.append("*** Service ").append(service.name());
 
-                try
-                {
+                try {
                     checkURL.check();
                     note.append(" is available.");
-                }
-                catch (CheckException e)
-                {
+                } catch (CheckException e) {
                     note.append(" is not available: ").append(e.getMessage());
-                }
-                finally
-                {
+                } finally {
                     note.append(" ***   ");
                 }
             }
 
             isAvailable = true;
-        }
-        catch (Throwable t)
-        {
-            note.append("Unrecoverable error: " ).append(t);
+        } catch (Throwable t) {
+            note.append("Unrecoverable error: ").append(t);
         }
 
         return new AvailabilityStatus(isAvailable, null, null, null, note.toString());
@@ -150,8 +138,7 @@ public class TargetResolverWebService implements WebService
      * @param state New state to set.
      */
     @Override
-    public void setState(final String state)
-    {
+    public void setState(final String state) {
         // Does nothing.
     }
 }

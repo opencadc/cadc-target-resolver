@@ -69,13 +69,12 @@
 package ca.nrc.cadc.nameresolver;
 
 import ca.nrc.cadc.net.NetUtil;
+import ca.nrc.cadc.util.ArrayUtil;
 
-import java.lang.annotation.Target;
 import java.util.*;
 
 
-class TargetResolverRequest
-{
+class TargetResolverRequest {
     private static final String TARGET_PARSING_ERROR = "Error parsing target from request";
 
     // The object name to resolve.
@@ -89,19 +88,17 @@ class TargetResolverRequest
     /**
      * Complete constructor for testing.
      *
-     * @param target            The target as entered by the client.
-     * @param serviceArray      Requested services.
-     * @param format            Output format.
-     * @param cached            Flag to indicate cached items are preferred.
-     * @param detail            Detail level of output.
+     * @param target       The target as entered by the client.
+     * @param serviceArray Requested services.
+     * @param format       Output format.
+     * @param cached       Flag to indicate cached items are preferred.
+     * @param detail       Detail level of output.
      */
     TargetResolverRequest(final String target, final Service[] serviceArray, final Format format,
-                          final boolean cached, final Detail detail)
-    {
+                          final boolean cached, final Detail detail) {
         this.target = target;
 
-        if (serviceArray != null)
-        {
+        if (serviceArray != null) {
             this.services.addAll(Arrays.asList(serviceArray));
         }
 
@@ -115,74 +112,50 @@ class TargetResolverRequest
      *
      * @param requestMap The mapping of values from the Request.
      */
-    TargetResolverRequest(final Map<String, String[]> requestMap)
-    {
+    TargetResolverRequest(final Map<String, String[]> requestMap) {
         final String[] targetParam = requestMap.get("target");
 
-        if ((targetParam == null) || (targetParam.length == 0))
-        {
+        if ((targetParam == null) || (targetParam.length == 0)) {
             throw new IllegalArgumentException(TARGET_PARSING_ERROR);
-        }
-        else
-        {
+        } else {
             this.target = NetUtil.decode(targetParam[0].trim());
         }
 
         final String[] serviceArray = requestMap.get("service");
 
-        if ((serviceArray == null) || (serviceArray.length == 0))
-        {
-            this.services.addAll(Arrays.asList(Service.values()));
-        }
-        else
-        {
-            this.services.addAll(getServices(serviceArray));
-        }
+        this.services.addAll(ArrayUtil.isEmpty(serviceArray) ? Arrays.asList(Service.values()) : getServices
+            (serviceArray));
 
         final String[] formatParam = requestMap.get("format");
         this.format = getFormat(formatParam);
 
         final String[] cachedParam = requestMap.get("cached");
         this.cached = (cachedParam == null) || (cachedParam.length == 0)
-                      || cachedParam[0].equalsIgnoreCase("yes");
+            || cachedParam[0].equalsIgnoreCase("yes");
 
         // amount of detail to return.
         final String[] detailParam = requestMap.get("detail");
-        if ((detailParam == null) || (detailParam.length == 0))
-        {
-            this.detail = Detail.MIN;
-        }
-        else
-        {
-            this.detail = Detail.valueOf(detailParam[0].toUpperCase());
-        }
+        this.detail = ArrayUtil.isEmpty(detailParam) ? Detail.MIN : Detail.valueOf(detailParam[0].toUpperCase());
     }
 
-    String getServicesAsString()
-    {
+    String getServicesAsString() {
         final StringBuilder sb = new StringBuilder();
 
-        for (final Service service : this.services)
-        {
+        for (final Service service : this.services) {
             sb.append(service.name()).append(", ");
         }
 
-        if (sb.length() > 0)
-        {
+        if (sb.length() > 0) {
             sb.delete((sb.length() - 2), sb.length());
         }
 
         return sb.toString();
     }
 
-    private Format getFormat(final String[] formatArray)
-    {
-        if ((formatArray == null) || (formatArray.length == 0))
-        {
+    private Format getFormat(final String[] formatArray) {
+        if ((formatArray == null) || (formatArray.length == 0)) {
             return Format.ASCII;
-        }
-        else
-        {
+        } else {
             return Format.valueOf(formatArray[0].toUpperCase());
         }
     }
@@ -194,34 +167,27 @@ class TargetResolverRequest
      * @param serviceArray Array of service names
      * @return String array of services to query
      */
-    private Collection<Service> getServices(final String[] serviceArray)
-    {
+    private Collection<Service> getServices(final String[] serviceArray) {
         final Set<Service> services = EnumSet.noneOf(Service.class);
 
-        for (final String service : serviceArray)
-        {
-            switch (service.trim().toUpperCase())
-            {
-                case "ALL":
-                {
+        for (final String service : serviceArray) {
+            switch (service.trim().toUpperCase()) {
+                case "ALL": {
                     services.addAll(Arrays.asList(Service.values()));
                     break;
                 }
 
-                case "NED":
-                {
+                case "NED": {
                     services.add(Service.NED);
                     break;
                 }
 
-                case "SIMBAD":
-                {
+                case "SIMBAD": {
                     services.add(Service.SIMBAD);
                     break;
                 }
 
-                case "VIZIER":
-                {
+                case "VIZIER": {
 //                    services.add(Service.VIZIER_CADC);
                     services.add(Service.VIZIER_CDS);
                     break;

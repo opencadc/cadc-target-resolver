@@ -68,16 +68,14 @@
 
 package ca.nrc.cadc.nameresolver;
 
-enum Format
-{
+enum Format {
     ASCII("text/plain"), JSON("application/json"), XML("text/xml");
 
 
     final String contentType;
 
 
-    Format(String contentType)
-    {
+    Format(String contentType) {
         this.contentType = contentType;
     }
 }

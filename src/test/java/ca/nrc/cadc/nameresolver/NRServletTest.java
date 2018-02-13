@@ -77,6 +77,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
+import ca.nrc.cadc.net.NetUtil;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -162,7 +164,7 @@ public class NRServletTest
 
         expect(mockRequest.getPathInfo()).andReturn("/test/info").once();
         expect(mockRequest.getMethod()).andReturn("GET").once();
-        expect(mockRequest.getRemoteAddr()).andReturn("http://remotehost.com").once();
+        expect(mockRequest.getHeader(NetUtil.FORWARDED_FOR_CLIENT_IP_HEADER)).andReturn("192.168.89.9").once();
         expect(mockRequest.getQueryString()).andReturn("target=m88&format=json").once();
         expect(mockRequest.getParameterMap()).andReturn(paramMap).once();
 
@@ -256,7 +258,8 @@ public class NRServletTest
 
         expect(mockRequest.getPathInfo()).andReturn("/test/info").once();
         expect(mockRequest.getMethod()).andReturn("GET").once();
-        expect(mockRequest.getRemoteAddr()).andReturn("http://remotehost.com").once();
+        expect(mockRequest.getHeader(NetUtil.FORWARDED_FOR_CLIENT_IP_HEADER)).andReturn(null).once();
+        expect(mockRequest.getRemoteAddr()).andReturn("192.168.3.3").once();
         expect(mockRequest.getQueryString()).andReturn("target=m88&format=ascii").once();
         expect(mockRequest.getParameterMap()).andReturn(paramMap).once();
 
