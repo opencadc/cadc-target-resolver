@@ -209,6 +209,7 @@ public class NRServlet extends HttpServlet
 
                 logInfo.setMessage(message);
                 logInfo.setSuccess(false);
+                response.setStatus(NAME_RESOLVER_HTTP_ERROR_CODE);
                 targetDataWriter.write(targetData, targetResolverRequest, response.getWriter());
             }
             else
