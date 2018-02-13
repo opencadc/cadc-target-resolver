@@ -73,8 +73,7 @@ import java.io.Writer;
 /**
  * ASCII output for the Target Data.
  */
-public class TargetDataASCIIWriter implements TargetDataWriter
-{
+public class TargetDataASCIIWriter implements TargetDataWriter {
     /**
      * Write out the target data to the given writer.
      *
@@ -84,10 +83,9 @@ public class TargetDataASCIIWriter implements TargetDataWriter
      * @throws Exception Any writing errors.
      */
     @Override
-    public void write(final TargetData data, final TargetResolverRequest request, final Writer writer) throws Exception
-    {
-        if (data.isError())
-        {
+    public void write(final TargetData data, final TargetResolverRequest request, final Writer writer) throws
+        Exception {
+        if (data.isError()) {
             writer.write(ERROR_KEY + "=" + data.getErrorMessage() + CRLF);
         }
 
@@ -98,23 +96,19 @@ public class TargetDataASCIIWriter implements TargetDataWriter
         writer.write(RA_KEY + "=" + data.getRA() + CRLF);
         writer.write(DEC_KEY + "=" + data.getDEC() + CRLF);
 
-        if (request.detail == Detail.MAX)
-        {
+        if (request.detail == Detail.MAX) {
             writer.write(ONAME_KEY + "=");
-            if (data.getObjectName() != null)
-            {
+            if (data.getObjectName() != null) {
                 writer.write(data.getObjectName());
             }
             writer.write(CRLF);
             writer.write(OTYPE_KEY + "=");
-            if (data.getObjectType() != null)
-            {
+            if (data.getObjectType() != null) {
                 writer.write(data.getObjectType());
             }
             writer.write(CRLF);
             writer.write(MTYPE_KEY + "=");
-            if (data.getMorphologyType() != null)
-            {
+            if (data.getMorphologyType() != null) {
                 writer.write(data.getMorphologyType());
             }
             writer.write(CRLF);

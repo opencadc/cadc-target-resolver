@@ -73,11 +73,10 @@ import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
 /**
  * @author jburke
  */
-public interface Parser
-{
+public interface Parser {
     /**
-     * @return      TargetData instance.
-     * @throws ca.nrc.cadc.nameresolver.exception.TargetDataParsingException    Error for parsing target data.
+     * @return TargetData instance.
+     * @throws ca.nrc.cadc.nameresolver.exception.TargetDataParsingException Error for parsing target data.
      */
     TargetData parse() throws TargetDataParsingException;
 }

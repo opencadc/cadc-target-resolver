@@ -69,14 +69,12 @@
 package ca.nrc.cadc.nameresolver;
 
 
-import ca.nrc.cadc.util.StringUtil;
 import org.json.JSONWriter;
 
 import java.io.Writer;
 
 
-public class TargetDataJSONWriter implements TargetDataWriter
-{
+public class TargetDataJSONWriter implements TargetDataWriter {
     /**
      * Write out the target data to the given writer.
      *
@@ -87,16 +85,13 @@ public class TargetDataJSONWriter implements TargetDataWriter
      */
     @Override
     public void write(final TargetData targetData, final TargetResolverRequest request, final Writer writer)
-            throws Exception
-    {
+        throws Exception {
         final JSONWriter jsonWriter = new JSONWriter(writer);
 
         jsonWriter.object();
 
-        try
-        {
-            if (targetData.isError())
-            {
+        try {
+            if (targetData.isError()) {
                 jsonWriter.key(ERROR_KEY).value(targetData.getErrorMessage());
             }
 
@@ -106,24 +101,20 @@ public class TargetDataJSONWriter implements TargetDataWriter
             jsonWriter.key(RA_KEY).value(targetData.getRA());
             jsonWriter.key(DEC_KEY).value(targetData.getDEC());
 
-            if (request.detail == Detail.MAX)
-            {
+            if (request.detail == Detail.MAX) {
                 jsonWriter.key(ONAME_KEY).value(getNullSafe(targetData.getObjectName()));
                 jsonWriter.key(OTYPE_KEY).value(getNullSafe(targetData.getObjectType()));
                 jsonWriter.key(MTYPE_KEY).value(getNullSafe(targetData.getMorphologyType()));
             }
 
             jsonWriter.key(TIME_KEY).value(targetData.getQueryTime());
-        }
-        finally
-        {
+        } finally {
             jsonWriter.endObject();
             writer.write("\r\n");
         }
     }
 
-    private String getNullSafe(final String string)
-    {
+    private String getNullSafe(final String string) {
         return (string == null) ? "" : string;
     }
 }

@@ -69,39 +69,13 @@
 package ca.nrc.cadc.nameresolver.exception;
 
 /**
- *
  * @author jburke
  */
-public class TargetDataParsingException extends Exception
-{
+public class TargetDataParsingException extends Exception {
     /**
-     *
+     * @param message       Message to display
      */
-    public TargetDataParsingException() { }
-
-    /**
-     * @param message
-     */
-    public TargetDataParsingException(String message)
-    {
+    public TargetDataParsingException(String message) {
         super(message);
     }
-
-    /**
-     * @param cause
-     */
-    public TargetDataParsingException(Throwable cause)
-    {
-        super(cause);
-    }
-
-    /**
-     * @param message
-     * @param cause
-     */
-    public TargetDataParsingException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
-    
 }

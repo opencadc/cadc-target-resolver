@@ -81,8 +81,7 @@ import ca.nrc.cadc.util.CoordUtil;
  *
  * @author jburke
  */
-public class SIMBADParser extends DefaultParser implements Parser
-{
+public class SIMBADParser extends DefaultParser implements Parser {
     private static final Logger log = Logger.getLogger(SIMBADParser.class);
 
     private static final String SIMBAD_ERROR_COMMENT = "!!";
@@ -90,7 +89,8 @@ public class SIMBADParser extends DefaultParser implements Parser
     private static final String SIMBAD_ERROR_BIBCODE = "For querying by bibcode";
     private static final String SIMBAD_ERROR_COORD_QUERY = "For querying by coordinates";
     private static final String SIMBAD_ERROR_CATALOG_NOT_FOUND = "No known catalog could be found";
-    private static final String SIMBAD_ERROR_CATALOG_INCORRECT_FORMAT = "this identifier has an incorrect format for catalog";
+    private static final String SIMBAD_ERROR_CATALOG_INCORRECT_FORMAT = "this identifier has an incorrect format for " +
+        "catalog";
 
 
     private static final String SIMBAD_COORDINATES = "Coordinates";
@@ -107,8 +107,7 @@ public class SIMBADParser extends DefaultParser implements Parser
      * @param host    the host name.
      * @param results the resolver results to parse.
      */
-    public SIMBADParser(final String target, final String host, final String results)
-    {
+    public SIMBADParser(final String target, final String host, final String results) {
         super(target, host, "Simbad", results);
     }
 
@@ -125,9 +124,7 @@ public class SIMBADParser extends DefaultParser implements Parser
      */
     @Override
     public TargetData parse()
-            throws TargetDataParsingException
-    {
-        TargetData targetData = null;
+        throws TargetDataParsingException {
         Double ra = null;
         Double dec = null;
         String name = null;
@@ -135,28 +132,22 @@ public class SIMBADParser extends DefaultParser implements Parser
         String morphology = null;
 
         String[] lines = getResults().split("\n");
-        for (String line : lines)
-        {
-            if (line == null || line.equals(""))
-            {
+        for (String line : lines) {
+            if (line == null || line.equals("")) {
                 continue;
             }
 
             // Try and detect some common query errors when SIMBAD thinks the
             // target is a coordinate, catalog, or bibcode.
-            if (line.startsWith(SIMBAD_ERROR_COMMENT))
-            {
+            if (line.startsWith(SIMBAD_ERROR_COMMENT)) {
                 if (line.contains(SIMBAD_ERROR_TARGET_NOT_FOUND) ||
                     line.contains(SIMBAD_ERROR_BIBCODE) ||
                     line.contains(SIMBAD_ERROR_COORD_QUERY) ||
                     line.contains(SIMBAD_ERROR_CATALOG_NOT_FOUND) ||
-                    line.contains(SIMBAD_ERROR_CATALOG_INCORRECT_FORMAT))
-                {
+                    line.contains(SIMBAD_ERROR_CATALOG_INCORRECT_FORMAT)) {
                     log.debug("Simbad query error: " + line);
                     return null;
-                }
-                else
-                {
+                } else {
                     final String message = "Simbad error: " + line;
                     log.debug(message + "\n" + getResults());
                     throw new TargetDataParsingException(message);
@@ -165,39 +156,29 @@ public class SIMBADParser extends DefaultParser implements Parser
 
             // JB 2014.07.03 - added extra check for what appears to be a bug in Simbad
             // where the Coordinates line is now starts with nullCoordinates.
-            if (line.startsWith(SIMBAD_COORDINATES) || line.startsWith("null" + SIMBAD_COORDINATES))
-            {
+            if (line.startsWith(SIMBAD_COORDINATES) || line.startsWith("null" + SIMBAD_COORDINATES)) {
                 String[] tokens = line.split(" ");
-                if (tokens.length < 3)
-                {
+                if (tokens.length < 3) {
                     final String message = "Unexpected Simbad Coordinates format: " + line;
                     log.debug(message + "\n" + getResults());
                     throw new TargetDataParsingException(message);
                 }
 
-                try
-                {
+                try {
                     ra = CoordUtil.raToDegrees(tokens[1]);
                     dec = CoordUtil.decToDegrees(tokens[2]);
-                }
-                catch (NumberFormatException nfe)
-                {
+                } catch (NumberFormatException nfe) {
                     final String message = "Simbad number format exception: " + nfe.getMessage();
                     log.debug(message + "\n" + getResults());
                     throw new TargetDataParsingException(message);
-                }
-                catch (IllegalArgumentException iae)
-                {
+                } catch (IllegalArgumentException iae) {
                     final String message = "Simbad illegal argument exception: " + iae.getMessage();
                     log.debug(message + "\n" + getResults());
                     throw new TargetDataParsingException(message);
                 }
-            }
-            else if (line.startsWith(SIMBAD_OBJECT))
-            {
+            } else if (line.startsWith(SIMBAD_OBJECT)) {
                 int start = line.indexOf("---", 0);
-                if (start == -1)
-                {
+                if (start == -1) {
                     final String message = "Unexpected Simbad Object format: " + line;
                     log.debug(message + "\n" + getResults());
                     throw new TargetDataParsingException(message);
@@ -205,36 +186,30 @@ public class SIMBADParser extends DefaultParser implements Parser
                 name = line.substring(SIMBAD_OBJECT.length(), start).trim();
 
                 int end = line.indexOf("---", start + 3);
-                if (end == -1)
-                {
+                if (end == -1) {
                     final String message = "Unexpected Simbad Object format: " + line;
                     log.debug(message + "\n" + getResults());
                     throw new TargetDataParsingException(message);
                 }
                 type = line.substring(start + 3, end).trim();
-            }
-            else if (line.startsWith(SIMBAD_MORPHOLOGY))
-            {
+            } else if (line.startsWith(SIMBAD_MORPHOLOGY)) {
                 String[] tokens = line.split(" ");
-                if (tokens.length < 3)
-                {
+                if (tokens.length < 3) {
                     final String message = "Unexpected Simbad Morphology format: " + line;
                     log.debug(message + "\n" + getResults());
                     throw new TargetDataParsingException(message);
                 }
                 morphology = tokens[2];
-                if (morphology.equals(SIMBAD_MORPHOLOGY_UNKNOWN))
-                {
+                if (morphology.equals(SIMBAD_MORPHOLOGY_UNKNOWN)) {
                     morphology = null;
                 }
             }
         }
 
-        if (ra != null)
-        {
-            targetData = new TargetData(getTarget(), getHost(), getDatabase(), ra, dec, name, type, morphology);
+        if (ra == null) {
+            return null;
+        } else {
+            return new TargetData(getTarget(), getHost(), getDatabase(), ra, dec, name, type, morphology);
         }
-
-        return targetData;
     }
 }

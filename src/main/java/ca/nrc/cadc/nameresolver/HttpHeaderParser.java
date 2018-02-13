@@ -79,8 +79,7 @@ import java.util.regex.Pattern;
  *
  * @author jburke
  */
-class HttpHeaderParser
-{
+class HttpHeaderParser {
     private static final String LOCATION_HEADER_KEY = "Location";
     private static final Pattern NEWLINE = Pattern.compile("\n");
     private static final Pattern HEADER_LINE = Pattern.compile("HTTP/(1.[0-9]) ([0-9]{3})(?: [0-9]{3})? ([A-Za-z ]*)");
@@ -94,10 +93,8 @@ class HttpHeaderParser
      *
      * @param data the data to parse.
      */
-    HttpHeaderParser(String data)
-    {
-        if (data == null)
-        {
+    HttpHeaderParser(String data) {
+        if (data == null) {
             throw new NullPointerException();
         }
         //log.debug("header:\n" + data);
@@ -110,16 +107,14 @@ class HttpHeaderParser
     /**
      * @return the header value, null if it doesn't exist.
      */
-    String getLocation()
-    {
+    String getLocation() {
         return headers.get(LOCATION_HEADER_KEY.toLowerCase());
     }
 
     /**
      * @return the http response code
      */
-    int getResponseCode()
-    {
+    int getResponseCode() {
         return responseCode;
     }
 
@@ -127,15 +122,12 @@ class HttpHeaderParser
      * Parse the data, using LF to separate the lines,
      * and either CRLF or LF to denote the end of the headers.
      */
-    private void parse()
-    {
+    private void parse() {
         int index = this.data.indexOf("\n");
-        if (index > 0)
-        {
+        if (index > 0) {
             final String header = this.data.substring(0, index).trim();
             final Matcher m = HEADER_LINE.matcher(header);
-            if (m.matches())
-            {
+            if (m.matches()) {
                 responseCode = Integer.parseInt(m.group(2));
                 data = data.substring(index + 1);
             }
@@ -143,27 +135,22 @@ class HttpHeaderParser
 
         int endOfHeader = data.indexOf("\r\n\r\n");
 
-        if (endOfHeader == -1)
-        {
+        if (endOfHeader == -1) {
             endOfHeader = data.indexOf("\n\n");
         }
 
-        if (endOfHeader > 0)
-        {
+        if (endOfHeader > 0) {
             String header = data.substring(0, endOfHeader);
             String[] lines = NEWLINE.split(header);
-            for (final String l : lines)
-            {
+            for (final String l : lines) {
                 String line = l.trim();
-                if (line.length() == 0)
-                {
+                if (line.length() == 0) {
                     continue;
                 }
 
                 int colon = line.indexOf(':');
 
-                if (colon == -1)
-                {
+                if (colon == -1) {
                     continue;
                 }
 

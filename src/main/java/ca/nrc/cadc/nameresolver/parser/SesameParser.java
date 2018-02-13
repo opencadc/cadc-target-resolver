@@ -71,6 +71,7 @@ package ca.nrc.cadc.nameresolver.parser;
 import ca.nrc.cadc.nameresolver.Parser;
 import ca.nrc.cadc.nameresolver.TargetData;
 import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
+
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
@@ -78,94 +79,77 @@ import org.apache.log4j.Logger;
 import ca.nrc.cadc.util.CoordUtil;
 
 /**
- *  Parses the results of a Sesame target query for the RA and DEC values.
- * 
- * @author jburke
+ * Parses the results of a Sesame target query for the RA and DEC values.
  *
+ * @author jburke
  */
-public class SesameParser extends DefaultParser implements Parser
-{
+public class SesameParser extends DefaultParser implements Parser {
     private static final Logger log = Logger.getLogger(SesameParser.class);
-    
-    private static final String VIZIER_TARGET_NOT_FOUND  = "#!VizieR:";
-    
-    /**
-     * Constructs a new SesameResolver thread initialized with the specified target name, 
-     * host name, and timeout.
 
-     * @param target the target name.
-     * @param host the host name.
+    private static final String VIZIER_TARGET_NOT_FOUND = "#!VizieR:";
+
+    /**
+     * Constructs a new SesameResolver thread initialized with the specified target name,
+     * host name, and timeout.
+     *
+     * @param target  the target name.
+     * @param host    the host name.
      * @param results the resolver results to parse.
      */
-    public SesameParser(String target, String host, String results)
-    {
+    public SesameParser(String target, String host, String results) {
         super(target, host, "Sesame", results);
     }
 
     /**
-     * Parses the resolver results for the RA and Dec values. Object name 
+     * Parses the resolver results for the RA and Dec values. Object name
      * and type, and morphology, are not included in the Vizier results
      * and will be null. Returns null if no results found.
-     * 
-     * @return TargetData object if successful in parsing out the RA and Dec 
-     *         values, or null if the resolver was unable to resolve the target.
-     * @throws TargetDataParsingException if unable to parse the results 
-     *         returned from the resolver.
+     *
+     * @return TargetData object if successful in parsing out the RA and Dec
+     * values, or null if the resolver was unable to resolve the target.
+     * @throws TargetDataParsingException if unable to parse the results
+     *                                    returned from the resolver.
      */
     @Override
-    public TargetData parse() throws TargetDataParsingException
-    {
+    public TargetData parse() throws TargetDataParsingException {
         TargetData targetData = null;
         String[] lines = getResults().split("\n");
 
-        for (String line : lines)
-        {
-            if (line == null || line.equals(""))
-            {
+        for (String line : lines) {
+            if (line == null || line.equals("")) {
                 continue;
             }
 
-            if (line.startsWith(VIZIER_TARGET_NOT_FOUND))
-            {
+            if (line.startsWith(VIZIER_TARGET_NOT_FOUND)) {
                 log.debug("Target not found in " + getHost());
                 return null;
             }
 
-            if (line.startsWith("#="))
-            {
+            if (line.startsWith("#=")) {
                 int colon = line.indexOf(':');
-                if (colon > 2)
-                {
+                if (colon > 2) {
                     setDatabase(line.substring(2, colon));
                 }
-            }
-            else if (line.startsWith("%J "))
-            {
+            } else if (line.startsWith("%J ")) {
                 StringTokenizer tokenizer = new StringTokenizer(line, " ");
-                if (tokenizer.countTokens() < 3)
-                {
+                if (tokenizer.countTokens() < 3) {
                     final String message = "Unexpected Sesame data format: " + line;
                     log.debug(message + "\n" + getResults());
                     throw new TargetDataParsingException(message);
                 }
 
-                try
-                {
+                try {
                     tokenizer.nextToken();
                     final double ra = CoordUtil.raToDegrees(tokenizer.nextToken());
                     final double dec = CoordUtil.decToDegrees(tokenizer.nextToken());
                     targetData = new TargetData(getTarget(), getHost(), getDatabase(), ra, dec, null,
                                                 null, null);
                     break;
-                }
-                catch (NumberFormatException nfe)
-                {
+                } catch (NumberFormatException nfe) {
                     final String message = "Sesame number format exception: " + nfe.getMessage();
                     log.debug(message + "\n" + getResults());
                     throw new TargetDataParsingException(message);
-                }
-                catch (IllegalArgumentException iae)
-                {
+                } catch (IllegalArgumentException iae) {
                     final String message = "Seasme illegal argument exception: " + iae.getMessage();
                     log.debug(message + "\n" + getResults());
                     throw new TargetDataParsingException(message);
