@@ -18,12 +18,13 @@ before_install:
 - sudo mv docker-compose /usr/local/bin
 script:
 - gradle clean build test
-- docker build -t opencadc/cadc-target-resolver:SNAPSHOT -t opencadc/cadc-target-resolver:alpine -t opencadc/cadc-target-resolver:${VERSION} -f docker/Dockerfile docker/
+- mkdir docker && cp Dockerfile docker/ && cp build/libs/*.war docker/ && docker build -t
+opencadc/cadc-target-resolver:SNAPSHOT -t opencadc/cadc-target-resolver:alpine -t opencadc/cadc-target-resolver:${VERSION} -f docker/Dockerfile docker/
 - cd integrationTest
 - docker-compose up -d
 - docker ps -a
 - gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST intTest
-- cd ../
+- cd ../ && rm -rf docker
 after_success:
 - if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME"
   --password-stdin; docker push opencadc/cadc-target-resolver:alpine; docker push
