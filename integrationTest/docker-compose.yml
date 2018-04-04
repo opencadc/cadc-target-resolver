@@ -1,14 +1,5 @@
-version: '3'
+version: '3.2'
 services:
-  cadc-target-resolver.cadc.dao.nrc.ca:
-    image: opencadc/cadc-target-resolver
-    ports:
-      - '8080:8080'
-      - '5555:5555'
-    networks:
-      - 'resolver'
-    environment:
-      - CATALINA_OPTS=-Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST
   proxy.cadc.dao.nrc.ca:
     image: nginx:alpine
     ports:
@@ -17,9 +8,14 @@ services:
       - 'resolver'
     volumes:
       - './default.conf:/etc/nginx/conf.d/default.conf'
-      - './root:/usr/share/nginx/html'
     depends_on:
       - cadc-target-resolver.cadc.dao.nrc.ca
+  cadc-target-resolver.cadc.dao.nrc.ca:
+    image: opencadc/cadc-target-resolver
+    networks:
+      - 'resolver'
+    environment:
+      CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca
 
 # Create the network 'resolver' for which this system will run within.
 networks:
