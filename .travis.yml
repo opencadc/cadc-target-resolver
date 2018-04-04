@@ -17,7 +17,7 @@ before_install:
 - chmod +x docker-compose
 - sudo mv docker-compose /usr/local/bin
 script:
-- gradle clean build test
+- gradle -i clean build test
 - mkdir docker && cp Dockerfile docker/ && cp build/libs/*.war docker/ && docker build -t
 opencadc/cadc-target-resolver:SNAPSHOT -t opencadc/cadc-target-resolver:alpine -t opencadc/cadc-target-resolver:${VERSION} -f docker/Dockerfile docker/
 - cd integrationTest
