@@ -7,23 +7,14 @@ plugins {
 repositories {
     mavenLocal()
     jcenter()
-
-    // CADC repository for the CADC specific library.
-    maven {
-        url = 'http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/m2repo'
-    }
 }
 
 sourceCompatibility = 1.7
-group = 'ca.nrc.cadc'
-version = '1009'
+group = 'org.opencadc'
+version = '1011'
 
 war {
     archiveName = project.name + '##' + project.version + '.war'
-}
-
-ext {
-    docker_image_name = 'opencadc/cadc-target-resolver'
 }
 
 sourceSets {
@@ -53,6 +44,7 @@ dependencies {
     compile 'org.opencadc:cadc-util:[1.0.5,)'
     compile 'org.opencadc:cadc-log:1.+'
     compile 'org.opencadc:cadc-vosi:1.+'
+    compile 'org.opencadc:caom2-search-lib:[2.3.1, )'
 
     runtime 'jstl:jstl:1.2+'
 
@@ -76,30 +68,4 @@ task intTest(type: Test) {
     // Assign all Java system properties from
     // the command line to the tests
     systemProperties System.properties
-}
-
-clean {
-    doFirst {
-        exec {
-            executable = 'rm'
-            args = ['-rf', './docker']
-        }
-    }
-}
-
-task initDockerize(type: Copy, dependsOn: [build]) {
-    from './'
-    include 'Dockerfile'
-    include '*.properties'
-    into 'docker/'
-}
-
-task copyWAR(type: Copy, dependsOn: war) {
-    from 'build/libs/'
-    into 'docker/'
-    include '*.war'
-}
-
-task dockerize(type: Exec, dependsOn: [clean, initDockerize, copyWAR]) {
-    commandLine 'docker', 'build', '-t', project.docker_image_name, '-f', './docker/Dockerfile', './docker/'
 }
