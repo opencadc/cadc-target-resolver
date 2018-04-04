@@ -11,7 +11,7 @@ services:
     depends_on:
       - cadc-target-resolver.cadc.dao.nrc.ca
   cadc-target-resolver.cadc.dao.nrc.ca:
-    image: opencadc/cadc-target-resolver
+    image: opencadc/cadc-target-resolver:SNAPSHOT
     networks:
       - 'resolver'
     environment:
