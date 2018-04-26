@@ -1,7 +1,7 @@
 env:
-  DOCKER_COMPOSE_VERSION: 1.20.1
+  DOCKER_COMPOSE_VERSION: 1.21.0
   REGISTRY_HOST: proxy.cadc.dao.nrc.ca
-  VERSION: 1011
+  VERSION: 1012
 language: java
 jdk:
 - oraclejdk8
@@ -21,7 +21,7 @@ script:
 - cd integrationTest
 - docker-compose up -d
 - docker ps -a
-- gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST intTest
+- gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST clean intTest
 - cd ../ && rm -rf docker
 after_success:
 - if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; docker push opencadc/cadc-target-resolver:alpine; docker push opencadc/cadc-target-resolver:${VERSION}; fi

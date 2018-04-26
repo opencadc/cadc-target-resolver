@@ -197,33 +197,15 @@ public class NRServletTest
     }
 
     @Test
-    public void testAsciiResults() throws Exception
-    {
-        final String target = "m31";
-        final double ra = 10.68479d;
-        final double dec = 41.26906d;
-        final String oname = "MESSIER 031";
-        final String otype = "G";
-        final String mtype = null;
-
-        validateASCII("target=m31", target, ra, dec, null, null, null, false);
-        validateASCII("target=m31&detail=min", target, ra, dec, null, null, null, false);
-        validateASCII("target=m31&detail=max", target, ra, dec, oname, otype, mtype, true);
-    }
-
-    @Test
     public void testAsciiResultsAll() throws Exception
     {
         final String target = "m31";
         final double ra = 10.68479d;
         final double dec = 41.26906d;
-        final String oname = "MESSIER 031";
-        final String otype = "G";
-        final String mtype = null;
 
-        validateASCII("target=m31&service=all", target, ra, dec, null, null, null, false);
-        validateASCII("target=m31&service=all&detail=min", target, ra, dec, null, null, null, false);
-        validateASCII("target=m31&service=all&detail=max", target, ra, dec, oname, otype, mtype, true);
+        validateASCIIConnection("target=m31&service=all", target, ra, dec);
+        validateASCIIConnection("target=m31&service=all&detail=min", target, ra, dec);
+        validateASCIIConnection("target=m31&service=all&detail=max", target, ra, dec);
     }
 
     @Test
@@ -274,6 +256,21 @@ public class NRServletTest
     }
 
     @Test
+    public void testOddCharacterAsciiResultsSimbad() throws Exception
+    {
+        final String target = "IRAS 16418+5459";
+        final double ra = 250.7321d;
+        final double dec = 54.90411d;
+        final String oname = "V* S Dra";
+        final String otype = "AB*";
+        final String mtype = "";
+
+        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad", target, ra, dec, null, null, null, false);
+        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad&detail=min", target, ra, dec, null, null, null, false);
+        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad&detail=max", target, ra, dec, oname, otype, mtype, true);
+    }
+
+    @Test
     public void testAsciiResultsSimbadWithRadius() throws Exception
     {
         final String target = "m31, 1.0";
@@ -311,38 +308,15 @@ public class NRServletTest
     }
 
     @Test
-    public void testJSONResults() throws Exception
-    {
-        final String target = "m31";
-        final double ra = 10.68479d;
-        final double dec = 41.26906d;
-        final String oname = "MESSIER 031";
-        final String otype = "G";
-        final String mtype = null;
-
-        validateJSON("target=m31&format=json", target, ra, dec, null, null, null,
-                     false);
-        validateJSON("target=m31&detail=min&format=json", target, ra, dec, null, null, null,
-                     false);
-        validateJSON("target=m31&detail=max&format=json", target, ra, dec, oname, otype, mtype, true);
-    }
-
-    @Test
     public void testJSONResultsAll() throws Exception
     {
         final String target = "m31";
         final double ra = 10.68479d;
         final double dec = 41.26906d;
-        final String oname = "MESSIER 031";
-        final String otype = "G";
-        final String mtype = null;
 
-        validateJSON("target=m31&format=json&service=all", target, ra, dec, null, null, null,
-                     false);
-        validateJSON("target=m31&detail=min&format=json&service=all", target, ra, dec, null, null,
-                     null, false);
-        validateJSON("target=m31&detail=max&format=json&service=all", target, ra, dec, oname, otype, mtype,
-                     true);
+        validateJSONConnection("target=m31&format=json&service=all", target, ra, dec);
+        validateJSONConnection("target=m31&detail=min&format=json&service=all", target, ra, dec);
+        validateJSONConnection("target=m31&detail=max&format=json&service=all", target, ra, dec);
     }
 
     @Test
@@ -399,38 +373,15 @@ public class NRServletTest
     }
 
     @Test
-    public void testXMLResults() throws Exception
-    {
-        final String target = "m31";
-        final double ra = 10.68479d;
-        final double dec = 41.26906d;
-        final String oname = "MESSIER 031";
-        final String otype = "G";
-        final String mtype = null;
-
-        validateXML("target=m31&format=xml", target, ra, dec, null, null, null,
-                     false);
-        validateXML("target=m31&detail=min&format=xml", target, ra, dec, null, null, null,
-                     false);
-        validateXML("target=m31&detail=max&format=xml", target, ra, dec, oname, otype, mtype, true);
-    }
-
-    @Test
     public void testXMLResultsAll() throws Exception
     {
         final String target = "m31";
         final double ra = 10.68479d;
         final double dec = 41.26906d;
-        final String oname = "MESSIER 031";
-        final String otype = "G";
-        final String mtype = null;
 
-        validateXML("target=m31&format=xml&service=all", target, ra, dec, null, null, null,
-                     false);
-        validateXML("target=m31&detail=min&format=xml&service=all", target, ra, dec, null, null,
-                     null, false);
-        validateXML("target=m31&detail=max&format=xml&service=all", target, ra, dec, oname, otype, mtype,
-                     true);
+        validateXMLConnection("target=m31&format=xml&service=all", target, ra, dec);
+        validateXMLConnection("target=m31&detail=min&format=xml&service=all", target, ra, dec);
+        validateXMLConnection("target=m31&detail=max&format=xml&service=all", target, ra, dec);
     }
 
     @Test
@@ -486,21 +437,28 @@ public class NRServletTest
                      otype, mtype, true);
     }
 
-    private void validateASCII(final String query, final String target, final double ra, final double dec,
-                               final String oname, final String otype, final String mtype, final boolean maxDetail)
-            throws Exception
-    {
+    private Map<String, String> validateASCIIConnection(final String query, final String target, final double ra,
+                                                        final double dec) throws Exception {
         HttpURLConnection conn = openConnection(query);
         conn.setRequestMethod("GET");
         assertEquals("wrong response code", 200, conn.getResponseCode());
         assertTrue("wrong content type", conn.getHeaderField("content-type").contains(TEXT_PLAIN));
 
-        Map<String, String> contentMap = getContentMap(conn);
+        final Map<String, String> contentMap = getContentMap(conn);
         assertTrue("content should not be empty", !contentMap.isEmpty());
         assertEquals("target does not match", target, contentMap.get(TARGET));
         assertEquals("coordsys does not match", ICRS, contentMap.get(COORDSYS));
         assertEquals("ra does not match", ra, new Double(contentMap.get(RA)), 1.0);
         assertEquals("dec does not match", dec, new Double(contentMap.get(DEC)), 1.0);
+
+        return contentMap;
+    }
+
+    private void validateASCII(final String query, final String target, final double ra, final double dec,
+                               final String oname, final String otype, final String mtype, final boolean maxDetail)
+            throws Exception
+    {
+        final Map<String, String> contentMap = validateASCIIConnection(query, target, ra, dec);
 
         if (maxDetail)
         {
@@ -543,10 +501,9 @@ public class NRServletTest
         return new JSONObject(getContent(conn));
     }
 
-    private void validateJSON(final String query, final String target, final double ra, final double dec,
-                              final String oname, final String otype, final String mtype, final boolean maxDetail)
-            throws Exception
-    {
+    private JSONObject validateJSONConnection(final String query, final String target, final double ra, final double
+        dec)
+        throws Exception {
         final HttpURLConnection conn = openConnection(query);
         conn.setRequestMethod("GET");
         assertEquals("wrong response code", 200, conn.getResponseCode());
@@ -559,6 +516,15 @@ public class NRServletTest
         assertEquals("coordsys does not match", ICRS, resultsJSON.getString("coordsys"));
         assertEquals("ra does not match", ra, resultsJSON.getDouble("ra"), 1.0);
         assertEquals("dec does not match", dec, resultsJSON.getDouble("dec"), 1.0);
+
+        return resultsJSON;
+    }
+
+    private void validateJSON(final String query, final String target, final double ra, final double dec,
+                              final String oname, final String otype, final String mtype, final boolean maxDetail)
+            throws Exception
+    {
+        final JSONObject resultsJSON = validateJSONConnection(query, target, ra, dec);
 
         if (maxDetail)
         {
@@ -591,10 +557,9 @@ public class NRServletTest
         }
     }
 
-    private void validateXML(final String query, final String target, final double ra, final double dec,
-                             final String oname, final String otype, final String mtype, final boolean maxDetail)
-            throws Exception
-    {
+    private Element validateXMLConnection(final String query, final String target, final double ra, final double dec)
+        throws Exception {
+
         final HttpURLConnection conn = openConnection(query);
         conn.setRequestMethod("GET");
         assertEquals("wrong response code", 200, conn.getResponseCode());
@@ -602,13 +567,22 @@ public class NRServletTest
                    conn.getHeaderField("content-type").contains(TEXT_XML));
 
         final Document document =
-                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(conn.getInputStream());
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(conn.getInputStream());
         final Element root = document.getDocumentElement();
 
         assertEquals("target does not match", NetUtil.encode(target), getText("target", root));
         assertEquals("coordsys does not match", ICRS, getText("coordsys", root));
         assertEquals("ra does not match", ra, new Double(getText("ra", root)), 1.0);
         assertEquals("dec does not match", dec, new Double(getText("dec", root)), 1.0);
+
+        return root;
+    }
+
+    private void validateXML(final String query, final String target, final double ra, final double dec,
+                             final String oname, final String otype, final String mtype, final boolean maxDetail)
+            throws Exception
+    {
+        final Element root = validateXMLConnection(query, target, ra, dec);
 
         if (maxDetail)
         {

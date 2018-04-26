@@ -113,7 +113,7 @@ import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
  * @author jburke
  */
 public class NRServlet extends HttpServlet {
-    private static final Logger log = Logger.getLogger(NRServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(NRServlet.class);
 
     private static final int NAME_RESOLVER_HTTP_ERROR_CODE = 425;
 
@@ -161,7 +161,7 @@ public class NRServlet extends HttpServlet {
         long start = System.currentTimeMillis();
         WebServiceLogInfo logInfo = new ServletLogInfo(request);
         logInfo.setMessage(request.getQueryString());
-        log.info(logInfo.start());
+        LOGGER.info(logInfo.start());
 
         String message;
         TargetData targetData = null;
@@ -212,7 +212,7 @@ public class NRServlet extends HttpServlet {
             message = e.getMessage();
             logInfo.setMessage(message);
             logInfo.setSuccess(false);
-            log.error("NameResolverServlet Exception: " + e.toString());
+            LOGGER.error("NameResolverServlet Exception: " + e.toString());
             response.setStatus(NAME_RESOLVER_HTTP_ERROR_CODE);
 
             if (targetDataWriter != null) {
@@ -229,7 +229,7 @@ public class NRServlet extends HttpServlet {
         } finally {
             // close remaining channels
             logInfo.setElapsedTime(System.currentTimeMillis() - start);
-            log.info(logInfo.end());
+            LOGGER.info(logInfo.end());
         }
     }
 
@@ -393,8 +393,9 @@ public class NRServlet extends HttpServlet {
                                 HttpHeaderParser headerParser = new HttpHeaderParser(data.toString());
                                 int responseCode = headerParser.getResponseCode();
 
-                                log.debug(String.format("Got Response code %d from %s (%s)", responseCode, currentHost,
-                                                        service.name()));
+                                LOGGER.debug(String.format("Got Response code %d from %s (%s)", responseCode,
+                                                           currentHost,
+                                                           service.name()));
 
                                 // 200 returned, process the data
                                 if (responseCode == HttpServletResponse.SC_OK) {
@@ -415,7 +416,7 @@ public class NRServlet extends HttpServlet {
                                     }
 
                                     if (targetData != null) {
-                                        log.debug("  channel has results: " + currentHost);
+                                        LOGGER.debug("  channel has results: " + currentHost);
                                         haveResults = true;
                                         closeChannel(channel, key);
                                         break;
@@ -427,10 +428,10 @@ public class NRServlet extends HttpServlet {
                                     || responseCode == HttpServletResponse.SC_MOVED_PERMANENTLY) {
                                     // get the redirect location
                                     String location = headerParser.getLocation();
-                                    log.debug("  redirected[" + responseCode + "] to " + location);
+                                    LOGGER.debug("  redirected[" + responseCode + "] to " + location);
                                     if (location == null) {
-                                        // can't do anything but log the error
-                                        log.error("redirected with no Location from " + currentHost);
+                                        // can't do anything but LOGGER the error
+                                        LOGGER.error("redirected with no Location from " + currentHost);
                                     } else {
                                         // open a new channel to the redirect location
                                         createChannel(selector, new URL(location));
@@ -445,13 +446,14 @@ public class NRServlet extends HttpServlet {
                                 currentHost = null;
                             }
                         } else {
-                            log.debug(String.format("Host does not match current host (%s != %s)", host, currentHost));
+                            LOGGER.debug(String.format("Host does not match current host (%s != %s)", host,
+                                                       currentHost));
                         }
                     }
                 }
             }
         } catch (IOException ioe) {
-            log.error("IOException querying services: " + ioe.toString());
+            LOGGER.error("IOException querying services: " + ioe.toString());
         }
 
         return targetData;
@@ -485,11 +487,11 @@ public class NRServlet extends HttpServlet {
             channel.configureBlocking(false);
             channel.connect(address);
             channel.register(selector, SelectionKey.OP_CONNECT);
-            log.debug("  created channel: " + host);
+            LOGGER.debug("  created channel: " + host);
         } catch (UnresolvedAddressException e) {
             logHostError(host, 404);
         } catch (IOException ioe) {
-            log.error("IOException creating channel for " + host, ioe);
+            LOGGER.error("IOException creating channel for " + host, ioe);
         }
     }
 
@@ -510,11 +512,11 @@ public class NRServlet extends HttpServlet {
             channel.register(selector, SelectionKey.OP_CONNECT);
             SelectionKey key = channel.keyFor(selector);
             key.attach(url);
-            log.debug("  created redirect channel: " + url.getHost());
+            LOGGER.debug("  created redirect channel: " + url.getHost());
         } catch (UnresolvedAddressException e) {
             logHostError(url.getHost(), 404);
         } catch (IOException ioe) {
-            log.error("IOException creating channel for " + url.getHost(), ioe);
+            LOGGER.error("IOException creating channel for " + url.getHost(), ioe);
         }
     }
 
@@ -534,7 +536,7 @@ public class NRServlet extends HttpServlet {
 
                 selector.close();
             } catch (IOException ioe) {
-                log.error("IOException closing channels: " + ioe.toString());
+                LOGGER.error("IOException closing channels: " + ioe.toString());
             }
         }
     }
@@ -557,9 +559,9 @@ public class NRServlet extends HttpServlet {
             }
             key.cancel();
             channel.close();
-            log.debug("  closed channel: " + host);
+            LOGGER.debug("  closed channel: " + host);
         } catch (IOException ioe) {
-            log.error("IO Exception closing channel: " + ioe.toString());
+            LOGGER.error("IO Exception closing channel: " + ioe.toString());
         }
     }
 
@@ -585,16 +587,16 @@ public class NRServlet extends HttpServlet {
                 final URL url = (URL) key.attachment();
                 channel.write(encoder.encode(CharBuffer.wrap("GET " + url.getPath() + "?" + url.getQuery()
                                                                  + "  HTTP/1.0\r\n\r\n")));
-                log.debug("  connected redirect channel: " + host);
+                LOGGER.debug("  connected redirect channel: " + host);
             } else {
                 final Service service = Service.valueOfFromHost(host);
                 final String connectString = service.getConnectString(target);
                 channel.write(encoder.encode(CharBuffer.wrap(connectString)));
-                log.debug(String.format("Connecting to '%s' with '%s'", host, connectString));
+                LOGGER.debug(String.format("Connecting to '%s' with '%s'", host, connectString));
             }
             channel.register(selector, SelectionKey.OP_READ);
         } catch (IOException ioe) {
-            log.error("IOException connecting channel: " + ioe.toString());
+            LOGGER.error("IOException connecting channel: " + ioe.toString());
         }
     }
 
@@ -614,7 +616,7 @@ public class NRServlet extends HttpServlet {
      */
     private int readChannel(SocketChannel channel, CharsetDecoder decoder, ByteBuffer buffer, CharBuffer charBuffer,
                             StringBuilder data, String host) {
-        log.debug("  reading channel: " + host);
+        LOGGER.debug("  reading channel: " + host);
         int bytesRead = 0;
         try {
             bytesRead = channel.read(buffer);
@@ -630,7 +632,7 @@ public class NRServlet extends HttpServlet {
                 charBuffer.clear();
             }
         } catch (IOException ioe) {
-            log.error("IOException reading channel: " + ioe.toString());
+            LOGGER.error("IOException reading channel: " + ioe.toString());
         }
         return bytesRead;
     }
@@ -644,7 +646,7 @@ public class NRServlet extends HttpServlet {
         String sb = Calendar.getInstance().getTime().toString() + " ***NameResolver*** "
             + "Error parsing resolver response: " + message;
 
-        log.error(sb);
+        LOGGER.error(sb);
     }
 
     /**
@@ -654,9 +656,9 @@ public class NRServlet extends HttpServlet {
      * @param statusCode the status code returned from the host.
      */
     private static void logHostError(final String host, final int statusCode) {
-        log.error(Calendar.getInstance().getTime().toString() +
-                      " *** cadc-target-resolver *** " + "Error connecting to host " + host + ", http status code "
-                      + statusCode);
+        LOGGER.error(Calendar.getInstance().getTime().toString() +
+                         " *** cadc-target-resolver *** " + "Error connecting to host " + host + ", http status code "
+                         + statusCode);
     }
 
     /**
