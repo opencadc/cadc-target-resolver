@@ -274,6 +274,21 @@ public class NRServletTest
     }
 
     @Test
+    public void testOddCharacterAsciiResultsSimbad() throws Exception
+    {
+        final String target = "IRAS 16418+5459";
+        final double ra = 250.7321d;
+        final double dec = 54.90411d;
+        final String oname = "V* S Dra";
+        final String otype = "AB*";
+        final String mtype = "";
+
+        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad", target, ra, dec, null, null, null, false);
+        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad&detail=min", target, ra, dec, null, null, null, false);
+        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad&detail=max", target, ra, dec, oname, otype, mtype, true);
+    }
+
+    @Test
     public void testAsciiResultsSimbadWithRadius() throws Exception
     {
         final String target = "m31, 1.0";

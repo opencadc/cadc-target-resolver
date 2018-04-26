@@ -118,7 +118,7 @@ class TargetResolverRequest {
         if ((targetParam == null) || (targetParam.length == 0)) {
             throw new IllegalArgumentException(TARGET_PARSING_ERROR);
         } else {
-            this.target = NetUtil.decode(targetParam[0].trim());
+            this.target = targetParam[0].trim();
         }
 
         final String[] serviceArray = requestMap.get("service");
