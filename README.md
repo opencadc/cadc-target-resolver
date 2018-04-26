@@ -1,6 +1,6 @@
 ---
 
-app.version: 1009
+app.version: 1012
 
 ---
 
