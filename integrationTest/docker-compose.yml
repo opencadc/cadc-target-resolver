@@ -11,8 +11,8 @@ services:
       - './entrypoint.sh:/entrypoint.sh'
       - './default.conf:/etc/nginx/conf.d/default.conf'
       - './root:/usr/share/nginx/html'
-    depends_on:
-      - cadc-target-resolver.cadc.dao.nrc.ca
+#    depends_on:
+#      - cadc-target-resolver.cadc.dao.nrc.ca
     environment:
       SSL_CERT: "${SSL_CERT}"
       SSL_KEY: "${SSL_KEY}"
