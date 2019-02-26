@@ -17,6 +17,7 @@ script:
 - cd integrationTest
 - docker-compose up -d
 - docker ps -a
+- docker-compose logs proxy.cadc.dao.nrc.ca
 - gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST clean intTest
 - cd ../ && rm -rf docker
 after_success:
