@@ -96,11 +96,6 @@ import static org.easymock.EasyMock.*;
 
 public class NRServletTest
 {
-
-    private enum testParams {
-        a, b
-    }
-
     @Test
     public void doGetJSON() throws Exception
     {
