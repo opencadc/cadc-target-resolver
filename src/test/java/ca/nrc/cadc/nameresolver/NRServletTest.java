@@ -69,6 +69,9 @@
 package ca.nrc.cadc.nameresolver;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -153,6 +156,10 @@ public class NRServletTest
         final Writer writer = new StringWriter();
         final PrintWriter printWriter = new PrintWriter(writer);
         final Map<String, String[]> paramMap = new HashMap<>();
+        ArrayList<String> paramList = new ArrayList<>();
+        paramList.add("target");
+        paramList.add("format");
+        Enumeration<String> paramNames = Collections.enumeration(paramList);
 
         paramMap.put("target", new String[]{"m88"});
         paramMap.put("format", new String[]{"json"});
@@ -167,6 +174,7 @@ public class NRServletTest
         expect(mockRequest.getHeader(NetUtil.FORWARDED_FOR_CLIENT_IP_HEADER)).andReturn("192.168.89.9").once();
         expect(mockRequest.getQueryString()).andReturn("target=m88&format=json").once();
         expect(mockRequest.getParameterMap()).andReturn(paramMap).once();
+        expect(mockRequest.getParameterNames()).andReturn(paramNames).once();
 
         replay(mockRequest, mockResponse);
 
@@ -247,6 +255,10 @@ public class NRServletTest
         final Writer writer = new StringWriter();
         final PrintWriter printWriter = new PrintWriter(writer);
         final Map<String, String[]> paramMap = new HashMap<>();
+        ArrayList<String> paramList = new ArrayList<>();
+        paramList.add("target");
+        paramList.add("format");
+        Enumeration<String> paramNames = Collections.enumeration(paramList);
 
         paramMap.put("target", new String[]{"m88"});
         paramMap.put("format", new String[]{"ascii"});
@@ -260,6 +272,7 @@ public class NRServletTest
         expect(mockRequest.getMethod()).andReturn("GET").once();
         expect(mockRequest.getHeader(NetUtil.FORWARDED_FOR_CLIENT_IP_HEADER)).andReturn(null).once();
         expect(mockRequest.getRemoteAddr()).andReturn("192.168.3.3").once();
+        expect(mockRequest.getParameterNames()).andReturn(paramNames).once();
         expect(mockRequest.getQueryString()).andReturn("target=m88&format=ascii").once();
         expect(mockRequest.getParameterMap()).andReturn(paramMap).once();
 

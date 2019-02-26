@@ -6,17 +6,26 @@
 
   <capability standardID="ivo://ivoa.net/std/VOSI#capabilities">
     <interface xsi:type="vs:ParamHTTP" role="std">
+      <accessURL use="full">https://replace.me.com/cadc-target-resolver/capabilities</accessURL>
+    </interface>
+    <interface xsi:type="vs:ParamHTTP" role="std">
       <accessURL use="full">http://replace.me.com/cadc-target-resolver/capabilities</accessURL>
     </interface>
   </capability>
 
   <capability standardID="vos://cadc.nrc.ca~vospace/CADC/std/Logging#control-1.0">
     <interface xsi:type="vs:ParamHTTP" role="std" version="1.0">
+      <accessURL use="full">https://replace.me.com/cadc-target-resolver/logControl</accessURL>
+    </interface>
+    <interface xsi:type="vs:ParamHTTP" role="std" version="1.0">
       <accessURL use="full">http://replace.me.com/cadc-target-resolver/logControl</accessURL>
     </interface> 
   </capability> 
 
   <capability standardID="vos://cadc.nrc.ca~vospace/CADC/std/NameResolver#names-1.0">
+    <interface xsi:type="vs:ParamHTTP" role="std" version="1.0">
+      <accessURL use="base">https://replace.me.com/cadc-target-resolver/find</accessURL>
+    </interface>
     <interface xsi:type="vs:ParamHTTP" role="std" version="1.0">
       <accessURL use="base">http://replace.me.com/cadc-target-resolver/find</accessURL>
     </interface>
