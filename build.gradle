@@ -9,7 +9,7 @@ repositories {
     jcenter()
 }
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 group = 'org.opencadc'
 version = '1013'
 

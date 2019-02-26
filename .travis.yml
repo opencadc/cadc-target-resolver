@@ -1,7 +1,3 @@
-env:
-  DOCKER_COMPOSE_VERSION: 1.21.0
-  REGISTRY_HOST: proxy.cadc.dao.nrc.ca
-  VERSION: 1012
 language: java
 jdk:
 - oraclejdk8

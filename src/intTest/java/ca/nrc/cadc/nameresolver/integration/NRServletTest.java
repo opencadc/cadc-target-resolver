@@ -100,8 +100,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author jburke
  */
-public class NRServletTest
-{
+public class NRServletTest {
     private static final Logger log = Logger.getLogger(NRServletTest.class);
 
     private static final String APPLICATION_JSON = "application/json";
@@ -118,38 +117,32 @@ public class NRServletTest
     private static final String ICRS = "ICRS";
     private final RegistryClient registryClient = new RegistryClient();
 
-    public NRServletTest()
-    {
+    public NRServletTest() {
     }
 
     @BeforeClass
-    public static void setUpClass() throws Exception
-    {
-        Log4jInit.setLevel("ca.nrc.cadc.nameresolver", Level.INFO);
+    public static void setUpClass() {
+        Log4jInit.setLevel("ca.nrc.cadc.nameresolver", Level.DEBUG);
     }
 
-    private HttpURLConnection openConnection(String query) throws Exception
-    {
+    private HttpURLConnection openConnection(String query) throws Exception {
         URL url = registryClient.getServiceURL(URI.create("ivo://cadc.nrc.ca/resolver"), Standards.RESOLVER_10,
                                                AuthMethod.ANON);
-        if (query != null)
-        {
+        if (query != null) {
             url = new URL(url.toExternalForm() + "?" + query);
             log.debug("query url: " + url.toExternalForm());
         }
         return (HttpURLConnection) url.openConnection();
     }
 
-    private String getContent(HttpURLConnection conn) throws Exception
-    {
+    private String getContent(HttpURLConnection conn) throws Exception {
         byte[] buffer = new byte[4096];
         int bytesRead;
         InputStream in = conn.getInputStream();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         // read until finished
-        while ((bytesRead = in.read(buffer)) > 0)
-        {
+        while ((bytesRead = in.read(buffer)) > 0) {
             out.write(buffer, 0, bytesRead);
         }
         final String content = out.toString("UTF-8");
@@ -157,20 +150,16 @@ public class NRServletTest
         return content;
     }
 
-    private Map<String, String> getContentMap(HttpURLConnection conn) throws Exception
-    {
+    private Map<String, String> getContentMap(HttpURLConnection conn) throws Exception {
         Map<String, String> map = new HashMap<>();
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         String line;
-        while ((line = in.readLine()) != null)
-        {
-            if (line.trim().isEmpty())
-            {
+        while ((line = in.readLine()) != null) {
+            if (line.trim().isEmpty()) {
                 continue;
             }
             String[] tokens = line.split("=");
-            switch (tokens.length)
-            {
+            switch (tokens.length) {
                 case 1:
                     map.put(tokens[0], "");
                     break;
@@ -189,16 +178,14 @@ public class NRServletTest
     }
 
     @Test
-    public void testBadRequest() throws Exception
-    {
+    public void testBadRequest() throws Exception {
         HttpURLConnection conn = openConnection("");
         conn.setRequestMethod("GET");
         assertEquals("wrong response code", 425, conn.getResponseCode());
     }
 
     @Test
-    public void testAsciiResultsAll() throws Exception
-    {
+    public void testAsciiResultsAll() throws Exception {
         final String target = "m31";
         final double ra = 10.68479d;
         final double dec = 41.26906d;
@@ -209,8 +196,7 @@ public class NRServletTest
     }
 
     @Test
-    public void testAsciiResultsNED() throws Exception
-    {
+    public void testAsciiResultsNED() throws Exception {
         final String target = "m31";
         final double ra = 10.68479d;
         final double dec = 41.26906d;
@@ -224,8 +210,7 @@ public class NRServletTest
     }
 
     @Test
-    public void testAsciiResultsNEDWithRadius() throws Exception
-    {
+    public void testAsciiResultsNEDWithRadius() throws Exception {
         final String target = "m31 0.5";
         final double ra = 10.68479d;
         final double dec = 41.26906d;
@@ -235,14 +220,13 @@ public class NRServletTest
 
         validateASCII("target=" + NetUtil.encode(target) + "&service=ned", "m31", ra, dec, null, null, null, false);
         validateASCII("target=" + NetUtil
-                .encode(target) + "&service=ned&detail=min", "m31", ra, dec, null, null, null, false);
+            .encode(target) + "&service=ned&detail=min", "m31", ra, dec, null, null, null, false);
         validateASCII("target=" + NetUtil
-                .encode(target) + "&service=ned&detail=max", "m31", ra, dec, oname, otype, mtype, true);
+            .encode(target) + "&service=ned&detail=max", "m31", ra, dec, oname, otype, mtype, true);
     }
 
     @Test
-    public void testAsciiResultsSimbad() throws Exception
-    {
+    public void testAsciiResultsSimbad() throws Exception {
         final String target = "m31";
         final double ra = 10.68479d;
         final double dec = 41.26906d;
@@ -256,8 +240,7 @@ public class NRServletTest
     }
 
     @Test
-    public void testOddCharacterAsciiResultsSimbad() throws Exception
-    {
+    public void testOddCharacterAsciiResultsSimbad() throws Exception {
         final String target = "IRAS 16418+5459";
         final double ra = 250.7321d;
         final double dec = 54.90411d;
@@ -266,13 +249,14 @@ public class NRServletTest
         final String mtype = "";
 
         validateASCII("target=" + NetUtil.encode(target) + "&service=simbad", target, ra, dec, null, null, null, false);
-        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad&detail=min", target, ra, dec, null, null, null, false);
-        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad&detail=max", target, ra, dec, oname, otype, mtype, true);
+        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad&detail=min", target, ra, dec, null, null,
+                      null, false);
+        validateASCII("target=" + NetUtil.encode(target) + "&service=simbad&detail=max", target, ra, dec, oname,
+                      otype, mtype, true);
     }
 
     @Test
-    public void testAsciiResultsSimbadWithRadius() throws Exception
-    {
+    public void testAsciiResultsSimbadWithRadius() throws Exception {
         final String target = "m31, 1.0";
         final String expected = "m31";
         final double ra = 10.68479d;
@@ -282,17 +266,16 @@ public class NRServletTest
         final String mtype = "SA(s)b";
 
         validateASCII("target=" + NetUtil
-                .encode(target) + "&service=simbad", expected, ra, dec, null, null, null, false);
+            .encode(target) + "&service=simbad", expected, ra, dec, null, null, null, false);
         validateASCII("target=" + NetUtil
-                .encode(target) + "&service=simbad&detail=min", expected, ra, dec, null, null, null, false);
+            .encode(target) + "&service=simbad&detail=min", expected, ra, dec, null, null, null, false);
         validateASCII("target=" + NetUtil
-                .encode(target) + "&service=simbad&detail=max", expected, ra, dec, oname, otype, mtype, true);
+            .encode(target) + "&service=simbad&detail=max", expected, ra, dec, oname, otype, mtype, true);
     }
 
     @Test
     @Ignore("Vizier is extremely unpredictable.")
-    public void testAsciiResultsVizier() throws Exception
-    {
+    public void testAsciiResultsVizier() throws Exception {
         final String target = "NGC 4321";
         final double ra = 185.74d;
         final double dec = 15.83d;
@@ -302,14 +285,13 @@ public class NRServletTest
 
         validateASCII("target=" + NetUtil.encode(target) + "&service=vizier", target, ra, dec, null, null, null, false);
         validateASCII("target=" + NetUtil
-                .encode(target) + "&service=vizier&detail=min", target, ra, dec, null, null, null, false);
+            .encode(target) + "&service=vizier&detail=min", target, ra, dec, null, null, null, false);
         validateASCII("target=" + NetUtil
-                .encode(target) + "&service=vizier&detail=max", target, ra, dec, oname, otype, mtype, true);
+            .encode(target) + "&service=vizier&detail=max", target, ra, dec, oname, otype, mtype, true);
     }
 
     @Test
-    public void testJSONResultsAll() throws Exception
-    {
+    public void testJSONResultsAll() throws Exception {
         final String target = "m31";
         final double ra = 10.68479d;
         final double dec = 41.26906d;
@@ -320,8 +302,7 @@ public class NRServletTest
     }
 
     @Test
-    public void testJSONResultsNED() throws Exception
-    {
+    public void testJSONResultsNED() throws Exception {
         final String target = "m31";
         final double ra = 10.68479d;
         final double dec = 41.26906d;
@@ -338,8 +319,7 @@ public class NRServletTest
     }
 
     @Test
-    public void testJSONResultsSimbad() throws Exception
-    {
+    public void testJSONResultsSimbad() throws Exception {
         final String target = "m31";
         final double ra = 10.684708d;
         final double dec = 41.26875d;
@@ -354,8 +334,7 @@ public class NRServletTest
 
     @Test
     @Ignore("Vizier is extremely unpredictable.")
-    public void testJSONResultsVizier() throws Exception
-    {
+    public void testJSONResultsVizier() throws Exception {
         final String target = "NGC 4321";
         final double ra = 185.74d;
         final double dec = 15.83d;
@@ -368,13 +347,12 @@ public class NRServletTest
         validateJSON("target=" + NetUtil.encode(target) + "&format=json&service=vizier&detail=min", target, ra, dec,
                      null, null, null, false);
         validateJSON("target=" + NetUtil
-                             .encode(target) + "&format=json&service=vizier&detail=max", target, ra, dec, oname,
+                         .encode(target) + "&format=json&service=vizier&detail=max", target, ra, dec, oname,
                      otype, mtype, true);
     }
 
     @Test
-    public void testXMLResultsAll() throws Exception
-    {
+    public void testXMLResultsAll() throws Exception {
         final String target = "m31";
         final double ra = 10.68479d;
         final double dec = 41.26906d;
@@ -385,8 +363,7 @@ public class NRServletTest
     }
 
     @Test
-    public void testXMLResultsNED() throws Exception
-    {
+    public void testXMLResultsNED() throws Exception {
         final String target = "m31";
         final double ra = 10.68479d;
         final double dec = 41.26906d;
@@ -395,16 +372,15 @@ public class NRServletTest
         final String mtype = null;
 
         validateXML("target=m31&format=xml&service=ned", target, ra, dec, null, null, null,
-                     false);
+                    false);
         validateXML("target=m31&detail=min&format=xml&service=ned", target, ra, dec, null, null,
-                     null, false);
+                    null, false);
         validateXML("target=m31&detail=max&format=xml&service=ned", target, ra, dec, oname, otype, mtype,
-                     true);
+                    true);
     }
 
     @Test
-    public void testXMLResultsSimbad() throws Exception
-    {
+    public void testXMLResultsSimbad() throws Exception {
         final String target = "m31";
         final double ra = 10.684708d;
         final double dec = 41.26875d;
@@ -419,8 +395,7 @@ public class NRServletTest
 
     @Test
     @Ignore("Vizier is extremely unpredictable.")
-    public void testXMLResultsVizier() throws Exception
-    {
+    public void testXMLResultsVizier() throws Exception {
         final String target = "NGC 4321";
         final double ra = 185.74d;
         final double dec = 15.83d;
@@ -429,12 +404,12 @@ public class NRServletTest
         final String mtype = null;
 
         validateXML("target=" + NetUtil.encode(target) + "&format=xml&service=vizier", target, ra, dec, null,
-                     null, null, false);
+                    null, null, false);
         validateXML("target=" + NetUtil.encode(target) + "&format=xml&service=vizier&detail=min", target, ra, dec,
-                     null, null, null, false);
+                    null, null, null, false);
         validateXML("target=" + NetUtil
-                             .encode(target) + "&format=xml&service=vizier&detail=max", target, ra, dec, oname,
-                     otype, mtype, true);
+                        .encode(target) + "&format=xml&service=vizier&detail=max", target, ra, dec, oname,
+                    otype, mtype, true);
     }
 
     private Map<String, String> validateASCIIConnection(final String query, final String target, final double ra,
@@ -456,39 +431,26 @@ public class NRServletTest
 
     private void validateASCII(final String query, final String target, final double ra, final double dec,
                                final String oname, final String otype, final String mtype, final boolean maxDetail)
-            throws Exception
-    {
+        throws Exception {
         final Map<String, String> contentMap = validateASCIIConnection(query, target, ra, dec);
 
-        if (maxDetail)
-        {
-            if (oname == null)
-            {
+        if (maxDetail) {
+            if (oname == null) {
                 assertEquals("oname does not match", "", contentMap.get(ONAME));
-            }
-            else
-            {
+            } else {
                 assertEquals("oname does not match", oname, contentMap.get(ONAME));
             }
-            if (otype == null)
-            {
+            if (otype == null) {
                 assertEquals("otype does not match", "", contentMap.get(OTYPE));
-            }
-            else
-            {
+            } else {
                 assertEquals("otype does not match", otype, contentMap.get(OTYPE));
             }
-            if (mtype == null)
-            {
+            if (mtype == null) {
                 assertEquals("mtype does not match", "", contentMap.get(MTYPE));
-            }
-            else
-            {
+            } else {
                 assertEquals("mtype does not match", mtype, contentMap.get(MTYPE));
             }
-        }
-        else
-        {
+        } else {
             assertNull("oname should be null", contentMap.get(ONAME));
             assertNull("otype should be null", contentMap.get(OTYPE));
             assertNull("mtype should be null", contentMap.get(MTYPE));
@@ -496,8 +458,7 @@ public class NRServletTest
         assertNotNull("time should not be null", contentMap.get(TIME_MS));
     }
 
-    private JSONObject getJSONContent(final HttpURLConnection conn) throws Exception
-    {
+    private JSONObject getJSONContent(final HttpURLConnection conn) throws Exception {
         return new JSONObject(getContent(conn));
     }
 
@@ -522,36 +483,25 @@ public class NRServletTest
 
     private void validateJSON(final String query, final String target, final double ra, final double dec,
                               final String oname, final String otype, final String mtype, final boolean maxDetail)
-            throws Exception
-    {
+        throws Exception {
         final JSONObject resultsJSON = validateJSONConnection(query, target, ra, dec);
 
-        if (maxDetail)
-        {
-            if (oname == null)
-            {
+        if (maxDetail) {
+            if (oname == null) {
                 assertEquals("oname does not match", "", resultsJSON.getString(ONAME));
-            }
-            else
-            {
+            } else {
                 assertEquals("oname does not match", oname, resultsJSON.getString(ONAME));
             }
 
-            if (otype == null)
-            {
+            if (otype == null) {
                 assertEquals("otype does not match", "", resultsJSON.getString(OTYPE));
-            }
-            else
-            {
+            } else {
                 assertEquals("otype does not match", otype, resultsJSON.getString(OTYPE));
             }
 
-            if (mtype == null)
-            {
+            if (mtype == null) {
                 assertEquals("mtype does not match", "", resultsJSON.getString(MTYPE));
-            }
-            else
-            {
+            } else {
                 assertEquals("mtype does not match", mtype, resultsJSON.getString(MTYPE));
             }
         }
@@ -580,43 +530,31 @@ public class NRServletTest
 
     private void validateXML(final String query, final String target, final double ra, final double dec,
                              final String oname, final String otype, final String mtype, final boolean maxDetail)
-            throws Exception
-    {
+        throws Exception {
         final Element root = validateXMLConnection(query, target, ra, dec);
 
-        if (maxDetail)
-        {
-            if (oname == null)
-            {
+        if (maxDetail) {
+            if (oname == null) {
                 assertEquals("oname does not match", "", getText(ONAME, root));
-            }
-            else
-            {
+            } else {
                 assertEquals("oname does not match", oname, getText(ONAME, root));
             }
 
-            if (otype == null)
-            {
+            if (otype == null) {
                 assertEquals("otype does not match", "", getText(OTYPE, root));
-            }
-            else
-            {
+            } else {
                 assertEquals("otype does not match", otype, getText(OTYPE, root));
             }
 
-            if (mtype == null)
-            {
+            if (mtype == null) {
                 assertEquals("mtype does not match", "", getText(MTYPE, root));
-            }
-            else
-            {
+            } else {
                 assertEquals("mtype does not match", mtype, getText(MTYPE, root));
             }
         }
     }
 
-    private String getText(final String tagName, final Element element) throws Exception
-    {
+    private String getText(final String tagName, final Element element) {
         final NodeList nodeList = element.getElementsByTagName(tagName);
 
         return (nodeList.getLength() > 0 ? nodeList.item(0).getTextContent() : "");

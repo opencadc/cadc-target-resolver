@@ -1,1 +1,1 @@
-ivo://cadc.nrc.ca/resolver  = http://localhost/cadc-target-resolver/capabilities
+ivo://cadc.nrc.ca/resolver  = https://proxy.cadc.dao.nrc.ca/cadc-target-resolver/capabilities
