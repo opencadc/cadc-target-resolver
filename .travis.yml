@@ -11,7 +11,7 @@ before_install:
 - tar xvf server-certs.tar
 - cd ../
 - sudo apt-get update
-- sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+- sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce curl
 - sudo rm /usr/local/bin/docker-compose
 - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
 - chmod +x docker-compose
@@ -22,7 +22,9 @@ script:
 - cd integrationTest
 - docker-compose up -d
 - docker ps -a
+- docker-compose logs cadc-target-resolver.cadc.dao.nrc.ca
 - docker-compose logs proxy.cadc.dao.nrc.ca
+- curl -vL -d 'level=DEBUG' http://cadc-target-resolver.cadc.dao.nrc.ca:8080/cadc-target-resolver/logControl
 - gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST clean intTest
 - cd ../ && rm -rf docker
 after_success:
