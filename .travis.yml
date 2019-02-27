@@ -9,6 +9,7 @@ before_install:
 - cd integrationTest
 - openssl aes-256-cbc -K $encrypted_bada46fd9bec_key -iv $encrypted_bada46fd9bec_iv -in server-certs.tar.enc -out server-certs.tar -d
 - tar xvf server-certs.tar
+- ls -alh
 - cd ../
 - sudo apt-get update
 - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
@@ -17,7 +18,6 @@ before_install:
 - chmod +x docker-compose
 - sudo mv docker-compose /usr/local/bin
 script:
-- ping -c 1 proxy.cadc.dao.nrc.ca
 - gradle -i clean build test
 - mkdir docker && cp Dockerfile docker/ && cp build/libs/*.war docker/ && docker build -t opencadc/cadc-target-resolver:SNAPSHOT -t opencadc/cadc-target-resolver:alpine -t opencadc/cadc-target-resolver:${VERSION} -f docker/Dockerfile docker/
 - cd integrationTest
