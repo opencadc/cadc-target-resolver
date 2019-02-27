@@ -20,10 +20,8 @@ script:
 - docker-compose logs cadc-target-resolver.cadc.dao.nrc.ca
 - docker-compose logs proxy.cadc.dao.nrc.ca
 - curl -vL -k -d 'level=DEBUG' http://proxy.cadc.dao.nrc.ca/cadc-target-resolver/logControl
-- sudo keytool -noprompt -importcert -alias CADC -storepass changeit -keystore -file server.crt
-- gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST clean intTest
+- gradle -d -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST clean intTest
 - cd ../ && rm -rf docker
-- sudo keytool -noprompt -delete -keystore /Library/Java/JavaVirtualMachines/jdk1.8.0_171.jdk/Contents/Home/jre/lib/security/cacerts -storepass changeit -alias CADC
 after_success:
 - if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; docker push opencadc/cadc-target-resolver:alpine; docker push opencadc/cadc-target-resolver:${VERSION}; fi
 - if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then echo "Not deploying."; fi
