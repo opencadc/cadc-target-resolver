@@ -73,8 +73,8 @@ import ca.nrc.cadc.nameresolver.Service;
 import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.vosi.AvailabilityPlugin;
 import ca.nrc.cadc.vosi.AvailabilityStatus;
-import ca.nrc.cadc.vosi.WebService;
 import ca.nrc.cadc.vosi.avail.CheckException;
 import ca.nrc.cadc.vosi.avail.CheckURL;
 
@@ -84,7 +84,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class TargetResolverWebService implements WebService {
+public class TargetResolverWebService implements AvailabilityPlugin {
     private final Map<Service, String> testNameValues = new HashMap<>();
 
     public TargetResolverWebService() {
@@ -93,6 +93,17 @@ public class TargetResolverWebService implements WebService {
         testNameValues.put(Service.VIZIER_CDS, NetUtil.encode("NGC 4321"));
         // Removing this with s2147
         // testNameValues.put(Service.VIZIER_CADC, NetUtil.encode("NGC 4321"));
+    }
+
+    /**
+     * Set application name. The appName is a string unique to this
+     * application.
+     *
+     * @param appName unique application name
+     */
+    @Override
+    public void setAppName(String appName) {
+        // Do nothing.
     }
 
     @Override
