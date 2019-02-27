@@ -5,6 +5,7 @@ sudo: required
 services:
 - docker
 before_install:
+- ls -alh
 - openssl aes-256-cbc -K $encrypted_33a5114866f8_key -iv $encrypted_33a5114866f8_iv -in integrationTest/server.crt.enc -out integrationTest/server.crt -d
 - openssl aes-256-cbc -K $encrypted_33a5114866f8_key -iv $encrypted_33a5114866f8_iv -in integrationTest/server.key.enc -out integrationTest/server.key -d
 - sudo apt-get update
