@@ -15,8 +15,6 @@ services:
       - cadc-target-resolver.cadc.dao.nrc.ca
   cadc-target-resolver.cadc.dao.nrc.ca:
     image: opencadc/cadc-target-resolver:SNAPSHOT
-    ports:
-      - '8080:8080'
     networks:
       - 'resolver'
     environment:

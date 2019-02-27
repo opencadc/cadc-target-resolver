@@ -24,7 +24,7 @@ script:
 - docker ps -a
 - docker-compose logs cadc-target-resolver.cadc.dao.nrc.ca
 - docker-compose logs proxy.cadc.dao.nrc.ca
-- curl -vL -d 'level=DEBUG' http://cadc-target-resolver.cadc.dao.nrc.ca:8080/cadc-target-resolver/logControl
+- curl -vL -d 'level=DEBUG' https://proxy.cadc.dao.nrc.ca/cadc-target-resolver/logControl
 - gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST clean intTest
 - cd ../ && rm -rf docker
 after_success:
