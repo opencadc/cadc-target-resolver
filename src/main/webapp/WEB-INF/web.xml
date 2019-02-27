@@ -16,7 +16,7 @@
     <init-param>
       <description>
       </description>
-      <param-name>ca.nrc.cadc.vosi.WebService</param-name>
+      <param-name>ca.nrc.cadc.vosi.AvailabilityPlugin</param-name>
       <param-value>ca.nrc.cadc.nameresolver.ws.TargetResolverWebService</param-value>
     </init-param>
     <load-on-startup>3</load-on-startup>
@@ -52,6 +52,7 @@
       <param-value>
         ca.nrc.cadc.nameresolver
         ca.nrc.cadc.vosi
+        ca.nrc.cadc.reg
       </param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>

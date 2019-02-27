@@ -9,6 +9,8 @@ services:
     volumes:
       - './default.conf:/etc/nginx/conf.d/default.conf'
       - './root:/usr/share/nginx/html'
+#      - './server.crt:/etc/nginx/server.crt'
+#      - './server.key:/etc/nginx/server.key'
     depends_on:
       - cadc-target-resolver.cadc.dao.nrc.ca
   cadc-target-resolver.cadc.dao.nrc.ca:
@@ -16,7 +18,7 @@ services:
     networks:
       - 'resolver'
     environment:
-      CATALINA_OPTS: -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca
+      CATALINA_OPTS: "-Dca.nrc.cadc.reg.client.RegistryClient.host=${REGISTRY_HOST}"
 
 # Create the network 'resolver' for which this system will run within.
 networks:
