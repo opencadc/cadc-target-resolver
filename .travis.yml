@@ -6,8 +6,10 @@ services:
 - docker
 before_install:
 - ls -alh
-- openssl aes-256-cbc -K $encrypted_bada46fd9bec_key -iv $encrypted_bada46fd9bec_iv -in integrationTest/server-certs.tar.enc -out integrationTest/server-certs.tar -d
+- cd integrationTest
+- openssl aes-256-cbc -K $encrypted_bada46fd9bec_key -iv $encrypted_bada46fd9bec_iv -in server-certs.tar.enc -out server-certs.tar -d
 - tar xvf server-certs.tar
+- cd ../
 - sudo apt-get update
 - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 - sudo rm /usr/local/bin/docker-compose
