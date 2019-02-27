@@ -19,8 +19,8 @@ script:
 - docker ps -a
 - docker-compose logs cadc-target-resolver.cadc.dao.nrc.ca
 - docker-compose logs proxy.cadc.dao.nrc.ca
-- curl -vL -k -d 'level=DEBUG' http://proxy.cadc.dao.nrc.ca/cadc-target-resolver/logControl
-- gradle -d -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST clean intTest
+- curl -vL -d 'level=DEBUG' http://proxy.cadc.dao.nrc.ca/cadc-target-resolver/logControl
+- gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST clean intTest
 - cd ../ && rm -rf docker
 after_success:
 - if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; docker push opencadc/cadc-target-resolver:alpine; docker push opencadc/cadc-target-resolver:${VERSION}; fi

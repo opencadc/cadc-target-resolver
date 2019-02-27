@@ -119,7 +119,7 @@ public class VosiCapabilitiesTest extends CapabilitiesTest {
             validateContent(caps);
         } catch (Exception t) {
             log.error("unexpected exception", t);
-            Assert.fail("unexpected exception: " + t);
+            throw new RuntimeException(t);
         }
     }
 
