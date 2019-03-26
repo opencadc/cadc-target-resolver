@@ -70,17 +70,27 @@
 package ca.nrc.cadc.nameresolver.integration;
 
 
+import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.net.HttpDownload;
 import ca.nrc.cadc.reg.Capabilities;
 import ca.nrc.cadc.reg.Capability;
 import ca.nrc.cadc.reg.Interface;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
+import ca.nrc.cadc.util.StringUtil;
 import ca.nrc.cadc.vosi.CapabilitiesTest;
+import ca.nrc.cadc.xml.XmlUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -90,17 +100,31 @@ import org.junit.Test;
  */
 public class VosiCapabilitiesTest extends CapabilitiesTest {
     private static final Logger log = Logger.getLogger(VosiCapabilitiesTest.class);
+    private static final URI RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/resolver");
 
     public VosiCapabilitiesTest() {
-        super(URI.create("ivo://cadc.nrc.ca/resolver"));
+        super(RESOURCE_ID);
+    }
+
+    RegistryClient getRegistryClient() throws Exception {
+        final String resourceCapsURL = System.getenv("RESOURCE_CAPS_URL");
+        if (StringUtil.hasText(resourceCapsURL)) {
+            return new RegistryClient(new URL(resourceCapsURL));
+        } else {
+            return new RegistryClient();
+        }
+    }
+
+    Capabilities getCapabilities() throws Exception {
+        return getRegistryClient().getCapabilities(RESOURCE_ID);
     }
 
     @Test
+    @Override
     public void testValidateCapabilitiesUsingGetCapabilities() {
-        RegistryClient rc = new RegistryClient();
         try {
             // get the capabilities associated with the resourceIdentifier
-            Capabilities caps = rc.getCapabilities(URI.create("ivo://cadc.nrc.ca/resolver"));
+            Capabilities caps = getCapabilities();
             Assert.assertNotNull(caps);
 
             // each web service supports capabilitites, availability and logControl
@@ -123,4 +147,57 @@ public class VosiCapabilitiesTest extends CapabilitiesTest {
         }
     }
 
+    @Override
+    @Test
+    public void testValidateCapabilitiesUsingGetServiceURL() {
+        try {
+            final RegistryClient rc = getRegistryClient();
+
+            URL serviceURL = rc.getServiceURL(RESOURCE_ID, Standards.VOSI_CAPABILITIES, AuthMethod.ANON);
+            Assert.assertNotNull(serviceURL);
+            log.info("serviceURL=" + serviceURL);
+
+            validateContent(getCapabilities());
+        } catch (Exception t) {
+            log.error("unexpected exception", t);
+            throw new RuntimeException(t);
+        }
+    }
+
+    @Override
+    @Test
+    public void testValidateCapabilitiesNamespaces() {
+        try {
+            final RegistryClient rc = getRegistryClient();
+            URL serviceURL = rc.getServiceURL(RESOURCE_ID, Standards.VOSI_CAPABILITIES, AuthMethod.ANON);
+            Assert.assertNotNull(serviceURL);
+            log.info("serviceURL=" + serviceURL);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            HttpDownload download = new HttpDownload(serviceURL, out);
+            download.setFollowRedirects(true);
+            download.run();
+
+            if (download.getThrowable() != null) {
+                Assert.fail("Unable to download capabilities XML because " + download.getThrowable().getMessage());
+            }
+
+            Document doc = XmlUtil.buildDocument(out.toString(StandardCharsets.UTF_8.toString()));
+            Element capabilities = doc.getRootElement();
+            List<Namespace> namespaces = capabilities.getAdditionalNamespaces();
+            for (Namespace namespace : namespaces) {
+                if (namespace.getURI().startsWith("http://www.ivoa.net/xml/VODataService/")) {
+                    Assert.assertEquals("Expected VODataService namespace prefix vs, found " + namespace.getPrefix(),
+                                        "vs", namespace.getPrefix());
+                }
+                if (namespace.getURI().startsWith("http://www.ivoa.net/xml/VOResource/")) {
+                    Assert.assertEquals("Expected VOResource namespace prefix vr, found " + namespace.getPrefix(),
+                                        "vr", namespace.getPrefix());
+                }
+            }
+        } catch (Exception t) {
+            log.error("unexpected exception", t);
+            throw new RuntimeException(t);
+        }
+    }
 }
