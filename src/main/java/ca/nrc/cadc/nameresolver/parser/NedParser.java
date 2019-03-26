@@ -93,8 +93,8 @@ import org.apache.log4j.Logger;
 public class NedParser extends DefaultParser implements Parser {
     private final static Logger log = Logger.getLogger(NedParser.class);
 
-    private static final String RA_FIELD_NAME = "RA(deg)";
-    private static final String DEC_FIELD_NAME = "DEC(deg)";
+    private static final String RA_FIELD_NAME = "RA";
+    private static final String DEC_FIELD_NAME = "DEC";
     private static final String NAME_FIELD_NAME = "Object Name";
     private static final String TYPE_FIELD_NAME = "Type";
 

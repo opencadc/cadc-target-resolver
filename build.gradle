@@ -11,7 +11,7 @@ repositories {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '1014'
+version = '1015'
 
 war {
     archiveName = project.name + '##' + project.version + '.war'

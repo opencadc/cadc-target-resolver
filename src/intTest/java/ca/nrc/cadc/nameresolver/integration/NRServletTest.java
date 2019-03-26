@@ -73,6 +73,7 @@ import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.util.Log4jInit;
+import ca.nrc.cadc.util.StringUtil;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -88,6 +89,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,9 +117,15 @@ public class NRServletTest {
     private static final String OTYPE = "otype";
     private static final String MTYPE = "mtype";
     private static final String ICRS = "ICRS";
-    private final RegistryClient registryClient = new RegistryClient();
+    private final RegistryClient registryClient;
 
-    public NRServletTest() {
+    public NRServletTest() throws Exception {
+        final String resourceCapsURL = System.getenv("RESOURCE_CAPS_URL");
+        if (StringUtil.hasText(resourceCapsURL)) {
+            registryClient = new RegistryClient(new URL(resourceCapsURL));
+        } else {
+            registryClient = new RegistryClient();
+        }
     }
 
     @BeforeClass
@@ -145,7 +153,7 @@ public class NRServletTest {
         while ((bytesRead = in.read(buffer)) > 0) {
             out.write(buffer, 0, bytesRead);
         }
-        final String content = out.toString("UTF-8");
+        final String content = out.toString(StandardCharsets.UTF_8.toString());
         log.debug("content:\n" + content);
         return content;
     }
@@ -220,9 +228,11 @@ public class NRServletTest {
 
         validateASCII("target=" + NetUtil.encode(target) + "&service=ned", "m31", ra, dec, null, null, null, false);
         validateASCII("target=" + NetUtil
-            .encode(target) + "&service=ned&detail=min", "m31", ra, dec, null, null, null, false);
+                                      .encode(target) + "&service=ned&detail=min", "m31", ra, dec, null, null, null,
+                      false);
         validateASCII("target=" + NetUtil
-            .encode(target) + "&service=ned&detail=max", "m31", ra, dec, oname, otype, mtype, true);
+                                      .encode(target) + "&service=ned&detail=max", "m31", ra, dec, oname, otype, mtype,
+                      true);
     }
 
     @Test
@@ -266,11 +276,13 @@ public class NRServletTest {
         final String mtype = "SA(s)b";
 
         validateASCII("target=" + NetUtil
-            .encode(target) + "&service=simbad", expected, ra, dec, null, null, null, false);
+                                      .encode(target) + "&service=simbad", expected, ra, dec, null, null, null, false);
         validateASCII("target=" + NetUtil
-            .encode(target) + "&service=simbad&detail=min", expected, ra, dec, null, null, null, false);
+                                      .encode(target) + "&service=simbad&detail=min", expected, ra, dec, null, null,
+                      null, false);
         validateASCII("target=" + NetUtil
-            .encode(target) + "&service=simbad&detail=max", expected, ra, dec, oname, otype, mtype, true);
+                                      .encode(target) + "&service=simbad&detail=max", expected, ra, dec, oname, otype,
+                      mtype, true);
     }
 
     @Test
@@ -285,9 +297,11 @@ public class NRServletTest {
 
         validateASCII("target=" + NetUtil.encode(target) + "&service=vizier", target, ra, dec, null, null, null, false);
         validateASCII("target=" + NetUtil
-            .encode(target) + "&service=vizier&detail=min", target, ra, dec, null, null, null, false);
+                                      .encode(target) + "&service=vizier&detail=min", target, ra, dec, null, null, null,
+                      false);
         validateASCII("target=" + NetUtil
-            .encode(target) + "&service=vizier&detail=max", target, ra, dec, oname, otype, mtype, true);
+                                      .encode(target) + "&service=vizier&detail=max", target, ra, dec, oname, otype,
+                      mtype, true);
     }
 
     @Test
@@ -347,7 +361,7 @@ public class NRServletTest {
         validateJSON("target=" + NetUtil.encode(target) + "&format=json&service=vizier&detail=min", target, ra, dec,
                      null, null, null, false);
         validateJSON("target=" + NetUtil
-                         .encode(target) + "&format=json&service=vizier&detail=max", target, ra, dec, oname,
+                                     .encode(target) + "&format=json&service=vizier&detail=max", target, ra, dec, oname,
                      otype, mtype, true);
     }
 
@@ -408,7 +422,7 @@ public class NRServletTest {
         validateXML("target=" + NetUtil.encode(target) + "&format=xml&service=vizier&detail=min", target, ra, dec,
                     null, null, null, false);
         validateXML("target=" + NetUtil
-                        .encode(target) + "&format=xml&service=vizier&detail=max", target, ra, dec, oname,
+                                    .encode(target) + "&format=xml&service=vizier&detail=max", target, ra, dec, oname,
                     otype, mtype, true);
     }
 
@@ -423,8 +437,8 @@ public class NRServletTest {
         assertTrue("content should not be empty", !contentMap.isEmpty());
         assertEquals("target does not match", target, contentMap.get(TARGET));
         assertEquals("coordsys does not match", ICRS, contentMap.get(COORDSYS));
-        assertEquals("ra does not match", ra, new Double(contentMap.get(RA)), 1.0);
-        assertEquals("dec does not match", dec, new Double(contentMap.get(DEC)), 1.0);
+        assertEquals("ra does not match", ra, Double.parseDouble(contentMap.get(RA)), 1.0);
+        assertEquals("dec does not match", dec, Double.parseDouble(contentMap.get(DEC)), 1.0);
 
         return contentMap;
     }
@@ -463,7 +477,7 @@ public class NRServletTest {
     }
 
     private JSONObject validateJSONConnection(final String query, final String target, final double ra, final double
-        dec)
+                                                                                                            dec)
         throws Exception {
         final HttpURLConnection conn = openConnection(query);
         conn.setRequestMethod("GET");
@@ -522,8 +536,8 @@ public class NRServletTest {
 
         assertEquals("target does not match", NetUtil.encode(target), getText("target", root));
         assertEquals("coordsys does not match", ICRS, getText("coordsys", root));
-        assertEquals("ra does not match", ra, new Double(getText("ra", root)), 1.0);
-        assertEquals("dec does not match", dec, new Double(getText("dec", root)), 1.0);
+        assertEquals("ra does not match", ra, Double.parseDouble(getText("ra", root)), 1.0);
+        assertEquals("dec does not match", dec, Double.parseDouble(getText("dec", root)), 1.0);
 
         return root;
     }

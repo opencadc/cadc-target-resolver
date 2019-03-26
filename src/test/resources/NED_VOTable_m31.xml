@@ -30,10 +30,10 @@
                 <LINK content-role="query" content-type="text/xml"
                       href="http://ned.ipac.caltech.edu/cgi-bin/objsearch?objname=${Object Name}"/>
             </FIELD>
-            <FIELD ID="main_col3" name="RA(deg)" ucd="pos.eq.ra;meta.main" datatype="double" unit="degrees" width="10">
+            <FIELD ID="main_col3" name="RA" ucd="pos.eq.ra;meta.main" datatype="double" unit="degrees" width="10">
                 <DESCRIPTION>Right Ascension in degrees (Equatorial J2000.0)</DESCRIPTION>
             </FIELD>
-            <FIELD ID="main_col4" name="DEC(deg)" ucd="pos.eq.dec;meta.main" datatype="double" unit="degrees"
+            <FIELD ID="main_col4" name="DEC" ucd="pos.eq.dec;meta.main" datatype="double" unit="degrees"
                    width="10">
                 <DESCRIPTION>Declination in degrees (Equatorial J2000.0)</DESCRIPTION>
             </FIELD>
