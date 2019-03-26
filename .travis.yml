@@ -1,30 +1,30 @@
 language: java
 jdk:
-- oraclejdk8
+  - oraclejdk8
 sudo: required
 services:
-- docker
+  - docker
 before_install:
-- sudo apt-get update
-- sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce curl
-- sudo rm /usr/local/bin/docker-compose
-- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-- chmod +x docker-compose
-- sudo mv docker-compose /usr/local/bin
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce curl
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
 script:
-- gradle -i clean build test
-- mkdir docker && cp Dockerfile docker/ && cp build/libs/*.war docker/ && docker build -t opencadc/cadc-target-resolver:SNAPSHOT -t opencadc/cadc-target-resolver:alpine -t opencadc/cadc-target-resolver:${VERSION} -f docker/Dockerfile docker/
-- cd integrationTest
-- docker-compose up -d
-- docker ps -a
-- docker-compose logs cadc-target-resolver.cadc.dao.nrc.ca
-- docker-compose logs proxy.cadc.dao.nrc.ca
-- curl -vL -d 'level=DEBUG' http://proxy.cadc.dao.nrc.ca/cadc-target-resolver/logControl
-- gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST clean intTest
-- cd ../ && rm -rf docker
+  - gradle -i clean build test
+  - mkdir docker && cp Dockerfile docker/ && cp build/libs/*.war docker/ && docker build -t opencadc/cadc-target-resolver:SNAPSHOT -t opencadc/cadc-target-resolver:alpine -t opencadc/cadc-target-resolver:${VERSION} -f docker/Dockerfile docker/
+  - cd integrationTest
+  - docker-compose up -d
+  - docker ps -a
+  - docker-compose logs cadc-target-resolver.cadc.dao.nrc.ca
+  - docker-compose logs proxy.cadc.dao.nrc.ca
+  - curl -vL -d 'level=DEBUG' http://proxy.cadc.dao.nrc.ca/cadc-target-resolver/logControl
+  - gradle -i -b ../build.gradle -Dca.nrc.cadc.reg.client.RegistryClient.host=$REGISTRY_HOST clean intTest
+  - cd ../ && rm -rf docker
 after_success:
-- if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; docker push opencadc/cadc-target-resolver:alpine; docker push opencadc/cadc-target-resolver:${VERSION}; fi
-- if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then echo "Not deploying."; fi
+  - if [ "$(. ./can-deploy.sh)" = "DEPLOY" ]; then echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin; docker push opencadc/cadc-target-resolver:alpine; docker push opencadc/cadc-target-resolver:${VERSION}; fi
+  - if [ "$(. ./can-deploy.sh)" != "DEPLOY" ]; then echo "Not deploying."; fi
 addons:
   hosts: proxy.cadc.dao.nrc.ca
 notifications:
