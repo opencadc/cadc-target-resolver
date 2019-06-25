@@ -61,7 +61,7 @@ public class SesameParserTest extends AbstractParserTest
     @Override
     protected String getHost()
     {
-        return "vizier.u-strasbg.fr";
+        return "vizier.cadc.dao.nrc.ca";
     }
     
     @Override

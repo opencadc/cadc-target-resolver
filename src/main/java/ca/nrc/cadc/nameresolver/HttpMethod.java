@@ -3,7 +3,7 @@
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2017.                            (c) 2017.
+ *  (c) 2019.                            (c) 2019.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -66,88 +66,14 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.nameresolver.ws;
+package ca.nrc.cadc.nameresolver;
 
-import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.nameresolver.Service;
-import ca.nrc.cadc.net.NetUtil;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.vosi.AvailabilityPlugin;
-import ca.nrc.cadc.vosi.AvailabilityStatus;
-import ca.nrc.cadc.vosi.avail.CheckException;
-import ca.nrc.cadc.vosi.avail.CheckURL;
+enum HttpMethod {
+    GET("GET"), POST("POST");
 
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+    final String method;
 
-
-public class TargetResolverWebService implements AvailabilityPlugin {
-    private final Map<Service, String> testNameValues = new HashMap<>();
-
-    public TargetResolverWebService() {
-        testNameValues.put(Service.NED, "m17");
-        testNameValues.put(Service.SIMBAD, "M17");
-        testNameValues.put(Service.VIZIER, NetUtil.encode("NGC 4321"));
-    }
-
-    /**
-     * Set application name. The appName is a string unique to this
-     * application.
-     *
-     * @param appName unique application name
-     */
-    @Override
-    public void setAppName(String appName) {
-        // Do nothing.
-    }
-
-    @Override
-    public AvailabilityStatus getStatus() {
-        boolean isAvailable = false;
-        StringBuilder note = new StringBuilder();
-        final RegistryClient registryClient = new RegistryClient();
-
-        try {
-            final URL baseURL = registryClient.getServiceURL(URI.create("ivo://cadc.nrc.ca/resolver"),
-                                                             Standards.RESOLVER_10, AuthMethod.ANON);
-
-            for (final Service service : Service.values()) {
-                final URL checkServiceURL = new URL(baseURL, "find?target=" + testNameValues.get(service)
-                    + "&format=json&service=" + service.getCommonName());
-                final CheckURL checkURL = new CheckURL(service.name(), checkServiceURL, 200,
-                                                       "application/json");
-                note.append("*** Service ").append(service.name());
-
-                try {
-                    checkURL.check();
-                    note.append(" is available.");
-                } catch (CheckException e) {
-                    note.append(" is not available: ").append(e.getMessage());
-                } finally {
-                    note.append(" ***   ");
-                }
-            }
-
-            isAvailable = true;
-        } catch (Throwable t) {
-            note.append("Unrecoverable error: ").append(t);
-        }
-
-        return new AvailabilityStatus(isAvailable, null, null, null, note.toString());
-    }
-
-    /**
-     * The AvailabilityServlet supports a POST with state=??? that it will pass
-     * on to the WebService. This can be used to implement state-changes in the
-     * service, eg disabling or enabling features.
-     *
-     * @param state New state to set.
-     */
-    @Override
-    public void setState(final String state) {
-        // Does nothing.
+    HttpMethod(String method) {
+        this.method = method;
     }
 }

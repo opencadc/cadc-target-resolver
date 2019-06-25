@@ -1,0 +1,33 @@
+{
+  "QueryTime": "Mon Jun 17 10:19:24 2019",
+  "NameResolver": "NED-Egret",
+  "Copyright": "(C) 2019 California Institute of Technology",
+  "Interpreted": {
+    "Name": "NGC 7293"
+  },
+  "Version": "2.0",
+  "Supplied": "NCG 7293",
+  "Preferred": {
+    "Redshift": {
+      "Value": null,
+      "Uncertainty": null,
+      "RefCode": null,
+      "QualityFlag": null
+    },
+    "Name": "NGC 7293",
+    "Position": {
+      "RA": 337.4107071,
+      "PosAngle": 0.0,
+      "Dec": -20.83733778,
+      "RefCode": "20102XMM.1.2..0000:",
+      "UncSemiMajor": 0.0003111111111,
+      "UncSemiMinor": 0.0003111111111
+    },
+    "ObjType": {
+      "Value": "PN",
+      "RefCode": null
+    }
+  },
+  "StatusCode": 100,
+  "ResultCode": 3
+}

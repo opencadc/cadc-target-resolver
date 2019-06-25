@@ -68,6 +68,7 @@
 
 package ca.nrc.cadc.nameresolver;
 
+import ca.nrc.cadc.nameresolver.parser.NEDParser;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -80,12 +81,7 @@ import java.nio.channels.UnresolvedAddressException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,9 +93,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import ca.nrc.cadc.nameresolver.parser.SIMBADParser;
+import ca.nrc.cadc.nameresolver.parser.SimbadParser;
 import ca.nrc.cadc.nameresolver.parser.SesameParser;
-import ca.nrc.cadc.nameresolver.parser.NedParser;
 import ca.nrc.cadc.log.ServletLogInfo;
 import ca.nrc.cadc.log.WebServiceLogInfo;
 import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
@@ -121,6 +116,7 @@ public class NRServlet extends HttpServlet {
     private static final long TARGET_DATA_CACHE_LIFE = 604800000L;  // cache life in milliseconds (one week)
     private static final int DEFAULT_TARGET_CACHE_SIZE = 1000;
     private static final int DEFAULT_SELECTOR_TIMEOUT = 1000;
+    private static final int SESAME_SELECTOR_TIMEOUT = 5000;        // in milliseconds (5 secs)
     private static final String TARGET_NOT_FOUND = "Target not found";
     private static final Pattern RADIUS_SEARCH_PATTERN = Pattern.compile("(\\w*).*,?\\s+\\d+");
 
@@ -282,7 +278,7 @@ public class NRServlet extends HttpServlet {
             createChannels(selector, targetResolverRequest.services);
 
             // Query the services for the target
-            return queryServices(selector, targetResolverRequest.target);
+            return queryServices(selector, targetResolverRequest.services, targetResolverRequest.target);
         } finally {
             closeChannels(selector);
         }
@@ -346,10 +342,12 @@ public class NRServlet extends HttpServlet {
      * Allow tests to override.
      *
      * @param selector the selector
+     * @param services list of services to query
      * @param target   the target name to resolve
      * @return TargetData with the target coordinates
      */
-    TargetData queryServices(Selector selector, String target) {
+    TargetData queryServices(Selector selector, Collection<Service> services, String target) {
+        long start = System.currentTimeMillis();
         TargetData targetData = null;
         try {
             // create 'coders and buffers
@@ -358,11 +356,18 @@ public class NRServlet extends HttpServlet {
             ByteBuffer buffer = ByteBuffer.allocateDirect(2048);
             CharBuffer charBuffer = CharBuffer.allocate(2048);
 
-            // process the selector keys
             boolean haveResults = false;
-            String currentHost = null;
             final StringBuilder data = new StringBuilder();
+            Map<Service, TargetData> serviceData = new HashMap<Service, TargetData>(4);
 
+            // Add services not queried with null data so we don't expect results back.
+            for (Service service : Service.values()) {
+                if (!services.contains(service)) {
+                    serviceData.put(service, null);
+                }
+            }
+
+            // process the selector keys
             while (selector.select(DEFAULT_SELECTOR_TIMEOUT) > 0 && !haveResults) {
                 final Set<SelectionKey> keys = selector.selectedKeys();
                 for (final Iterator<SelectionKey> it = keys.iterator(); it.hasNext(); ) {
@@ -381,81 +386,113 @@ public class NRServlet extends HttpServlet {
                         // remember which channel we are processing
                         final String host = channel.socket().getInetAddress().getHostName();
 
-                        if (currentHost == null) {
-                            currentHost = host;
-                        }
+                        final Service service = Service.valueOfFromHost(host);
+                        data.setLength(0);
+                        int bytesRead = readChannel(channel, key, decoder,
+                                buffer, charBuffer, data, host);
+                        if (bytesRead == -1) {
 
-                        if (host.equals(currentHost)) {
-                            final Service service = Service.valueOfFromHost(currentHost);
-                            int bytesRead = readChannel(channel, decoder, buffer, charBuffer, data, currentHost);
-                            if (bytesRead == -1) {
-                                // All data read, check the http response code
-                                HttpHeaderParser headerParser = new HttpHeaderParser(data.toString());
-                                int responseCode = headerParser.getResponseCode();
+                            // All data read, check the http response code
+                            HttpHeaderParser headerParser = new HttpHeaderParser(
+                                    data.toString());
+                            int responseCode = headerParser.getResponseCode();
 
-                                LOGGER.debug(String.format("Got Response code %d from %s (%s)", responseCode,
-                                                           currentHost,
-                                                           service.name()));
+                            LOGGER.debug(String.format("%s - response code %d",
+                                    host, responseCode));
 
-                                // 200 returned, process the data
-                                if (responseCode == HttpServletResponse.SC_OK) {
-                                    Parser parser;
+                            // 200 returned, process the data
+                            if (responseCode == HttpServletResponse.SC_OK) {
+                                Parser parser;
 
-                                    if (service == Service.NED) {
-                                        parser = new NedParser(target, currentHost, data.toString());
-                                    } else if (service == Service.SIMBAD) {
-                                        parser = new SIMBADParser(target, currentHost, data.toString());
-                                    } else {
-                                        parser = new SesameParser(target, currentHost, data.toString());
-                                    }
+                                if (service == Service.NED) {
+                                    parser = new NEDParser(target, host, data.toString());
+                                } else if (service == Service.SIMBAD) {
+                                    parser = new SimbadParser(target, host, data.toString());
+                                } else {
+                                    parser = new SesameParser(target, host, data.toString());
+                                }
 
-                                    try {
-                                        targetData = parser.parse();
-                                    } catch (TargetDataParsingException e) {
-                                        logParserError(e.getMessage());
-                                    }
+                                try {
+                                    targetData = parser.parse();
+                                } catch (TargetDataParsingException e) {
+                                    logParserError(e.getMessage());
+                                }
 
-                                    if (targetData != null) {
-                                        LOGGER.debug("  channel has results: " + currentHost);
-                                        haveResults = true;
-                                        closeChannel(channel, key);
+                                serviceData.put(service, targetData);
+
+                                if (targetData != null) {
+                                    if (service == Service.NED || service == Service.SIMBAD) {
                                         break;
                                     }
                                 }
-
-                                // 302 or 303, redirected
-                                else if (responseCode == HttpServletResponse.SC_MOVED_TEMPORARILY
-                                    || responseCode == HttpServletResponse.SC_MOVED_PERMANENTLY) {
-                                    // get the redirect location
-                                    String location = headerParser.getLocation();
-                                    LOGGER.debug("  redirected[" + responseCode + "] to " + location);
-                                    if (location == null) {
-                                        // can't do anything but LOGGER the error
-                                        LOGGER.error("redirected with no Location from " + currentHost);
-                                    } else {
-                                        // open a new channel to the redirect location
-                                        createChannel(selector, new URL(location));
-                                    }
-                                } else {
-                                    logHostError(currentHost, headerParser.getResponseCode());
-                                }
-
-                                // close channel, reset data StringBuilder and currentHost
-                                closeChannel(channel, key);
-                                data.setLength(0);
-                                currentHost = null;
                             }
-                        } else {
-                            LOGGER.debug(String.format("Host does not match current host (%s != %s)", host,
-                                                       currentHost));
+
+                            // 302 or 303, redirected
+                            else if (responseCode == HttpServletResponse.SC_MOVED_TEMPORARILY
+                                    || responseCode == HttpServletResponse.SC_MOVED_PERMANENTLY) {
+                                // get the redirect location
+                                String location = headerParser.getLocation();
+                                LOGGER.debug("  redirected[" + responseCode + "] to "
+                                        + location);
+                                if (location == null) {
+                                    // can't do anything but LOGGER the error
+                                    LOGGER.error(
+                                            "redirected with no Location from "
+                                                    + host);
+                                } else {
+                                    // open a new channel to the redirect location
+                                    createChannel(selector, new URL(location));
+                                }
+                            } else {
+                                logHostError(host, headerParser.getResponseCode());
+                            }
+                        }
+
+                        targetData = getTargetData(serviceData, start);
+                        if (targetData != null) {
+                            haveResults = true;
                         }
                     }
                 }
-            }
+            } // end while
         } catch (IOException ioe) {
             LOGGER.error("IOException querying services: " + ioe.toString());
         }
 
+        return targetData;
+    }
+
+    /**
+     * - return NED or Simbad results if available.
+     * - if NED or Simbad cannot find target return Sesame if available.
+     * - if NED or Simbad haven't returned after a time, return Sesame if available.
+     *
+     * @param serviceData Map of Service and TargetData results
+     * @param start Start time of service querying in milliseconds
+     * @return TargetData which can be null
+     */
+    TargetData getTargetData(Map<Service, TargetData> serviceData, long start) {
+
+        TargetData targetData;
+        targetData = serviceData.get(Service.NED);
+        if (targetData == null) {
+            targetData = serviceData.get(Service.SIMBAD);
+        }
+
+        if (targetData == null) {
+            if (serviceData.containsKey(Service.NED) && serviceData.get(Service.NED) == null &&
+                    serviceData.containsKey(Service.SIMBAD) && serviceData.get(Service.SIMBAD) == null) {
+                targetData = serviceData.get(Service.VIZIER);
+            }
+
+            if (targetData == null) {
+                if ((System.currentTimeMillis() - start) > SESAME_SELECTOR_TIMEOUT) {
+                    if (!serviceData.containsKey(Service.NED) && !serviceData.containsKey(Service.SIMBAD)) {
+                        targetData = serviceData.get(Service.VIZIER);
+                    }
+                }
+            }
+        }
         return targetData;
     }
 
@@ -487,7 +524,7 @@ public class NRServlet extends HttpServlet {
             channel.configureBlocking(false);
             channel.connect(address);
             channel.register(selector, SelectionKey.OP_CONNECT);
-            LOGGER.debug("  created channel: " + host);
+            LOGGER.debug(host + " - created channel");
         } catch (UnresolvedAddressException e) {
             logHostError(host, 404);
         } catch (IOException ioe) {
@@ -512,7 +549,7 @@ public class NRServlet extends HttpServlet {
             channel.register(selector, SelectionKey.OP_CONNECT);
             SelectionKey key = channel.keyFor(selector);
             key.attach(url);
-            LOGGER.debug("  created redirect channel: " + url.getHost());
+            LOGGER.debug(url.getHost() + " - created redirect channel");
         } catch (UnresolvedAddressException e) {
             logHostError(url.getHost(), 404);
         } catch (IOException ioe) {
@@ -559,7 +596,7 @@ public class NRServlet extends HttpServlet {
             }
             key.cancel();
             channel.close();
-            LOGGER.debug("  closed channel: " + host);
+            LOGGER.debug(host + " - closed channel");
         } catch (IOException ioe) {
             LOGGER.error("IO Exception closing channel: " + ioe.toString());
         }
@@ -587,12 +624,13 @@ public class NRServlet extends HttpServlet {
                 final URL url = (URL) key.attachment();
                 channel.write(encoder.encode(CharBuffer.wrap("GET " + url.getPath() + "?" + url.getQuery()
                                                                  + "  HTTP/1.0\r\n\r\n")));
-                LOGGER.debug("  connected redirect channel: " + host);
+                LOGGER.debug(host + " -  connected redirect channel");
             } else {
                 final Service service = Service.valueOfFromHost(host);
                 final String connectString = service.getConnectString(target);
-                channel.write(encoder.encode(CharBuffer.wrap(connectString)));
-                LOGGER.debug(String.format("Connecting to '%s' with '%s'", host, connectString));
+                ByteBuffer encoded = encoder.encode(CharBuffer.wrap(connectString));
+                long bytes = channel.write(encoded);
+                LOGGER.debug(String.format("%s - %s", host, connectString));
             }
             channel.register(selector, SelectionKey.OP_READ);
         } catch (IOException ioe) {
@@ -607,6 +645,7 @@ public class NRServlet extends HttpServlet {
      * and close the channel.
      *
      * @param channel    the socket channel
+     * @param key        the selection key for this channel
      * @param decoder    the char decoder
      * @param buffer     the byte buffer
      * @param charBuffer the char buffer
@@ -614,14 +653,13 @@ public class NRServlet extends HttpServlet {
      * @param host       the host currently being processed
      * @return true if results have been found, false otherwise
      */
-    private int readChannel(SocketChannel channel, CharsetDecoder decoder, ByteBuffer buffer, CharBuffer charBuffer,
-                            StringBuilder data, String host) {
-        LOGGER.debug("  reading channel: " + host);
+    private int readChannel(SocketChannel channel, SelectionKey key, CharsetDecoder decoder, ByteBuffer buffer, CharBuffer charBuffer,
+            StringBuilder data, String host) {
+        LOGGER.debug(host + " - reading channel");
         int bytesRead = 0;
         try {
             bytesRead = channel.read(buffer);
-            if (bytesRead != -1) {
-                // Read the channel into a StringBuffer
+            while(bytesRead > 0) {
                 buffer.flip();
                 decoder.decode(buffer, charBuffer, false);
                 charBuffer.flip();
@@ -630,7 +668,10 @@ public class NRServlet extends HttpServlet {
                 }
                 buffer.clear();
                 charBuffer.clear();
+                bytesRead = channel.read(buffer);
             }
+            closeChannel(channel, key);
+            bytesRead = -1;
         } catch (IOException ioe) {
             LOGGER.error("IOException reading channel: " + ioe.toString());
         }

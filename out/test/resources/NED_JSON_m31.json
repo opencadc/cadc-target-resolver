@@ -1,0 +1,33 @@
+{
+  "ResultCode": 3,
+  "QueryTime": "Mon Jun 17 10:17:46 2019",
+  "Interpreted": {
+    "Name": "MESSIER 031"
+  },
+  "StatusCode": 100,
+  "Copyright": "(C) 2019 California Institute of Technology",
+  "Version": "2.0",
+  "Preferred": {
+    "Name": "MESSIER 031",
+    "Position": {
+      "Dec": 41.269065,
+      "RA": 10.68479292,
+      "PosAngle": 0.0,
+      "UncSemiMajor": 2.222222222e-5,
+      "UncSemiMinor": 2.222222222e-5,
+      "RefCode": "2010ApJS..189...37E"
+    },
+    "ObjType": {
+      "Value": "G",
+      "RefCode": null
+    },
+    "Redshift": {
+      "Value": -0.00100100006,
+      "Uncertainty": 1.29999999e-5,
+      "RefCode": "1991RC3.9.C...0000d",
+      "QualityFlag": null
+    }
+  },
+  "Supplied": "m31",
+  "NameResolver": "NED-Egret"
+}

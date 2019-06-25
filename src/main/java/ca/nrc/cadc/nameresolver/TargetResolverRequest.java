@@ -68,7 +68,6 @@
 
 package ca.nrc.cadc.nameresolver;
 
-import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.util.ArrayUtil;
 
 import java.util.*;
@@ -188,8 +187,7 @@ class TargetResolverRequest {
                 }
 
                 case "VIZIER": {
-//                    services.add(Service.VIZIER_CADC);
-                    services.add(Service.VIZIER_CDS);
+                    services.add(Service.VIZIER);
                     break;
                 }
             }

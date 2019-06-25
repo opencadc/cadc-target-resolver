@@ -73,36 +73,37 @@ import ca.nrc.cadc.net.NetUtil;
 
 public enum Service {
     // Queries the NED service at CalTech.
-    NED("ned", "ned.ipac.caltech.edu", 80, "/cgi-bin/nph-objsearch?"
-        + "extend=no&out_csys=Equatorial"
-        + "&out_equinox=J2000.0&obj_sort=RA+or+Longitude"
-        + "&of=xml_main&zv_breaker=30000.0"
-        + "&list_limit=1&img_stamp=NO"
-        + "&objname=", "HTTP/1.0\r\n\r\n", false),
+    NED("ned", "ned.ipac.caltech.edu", 80,
+            HttpMethod.POST, "/srs/ObjectLookup", "",
+            "HTTP/1.1\r\n\r\n", false),
 
     // Queries the SIMBAD service at CDS.
-    SIMBAD("simbad", "simbad.u-strasbg.fr", 80, "/simbad/sim-id?"
+    SIMBAD("simbad", "simbad.u-strasbg.fr", 80,
+            HttpMethod.GET, "/simbad/sim-id?"
         + "output.max=1&output.format=ASCII"
         + "&obj.coo1=on&obj.coo2=off&obj.coo3=off&obj.coo4=off"
         + "&frame1=ICRS&epoch1=J2000&coodisp1=d"
         + "&obj.pmsel=off&obj.plxsel=off&obj.rvsel=off&obj.spsel=off"
         + "&obj.mtsel=on&obj.sizesel=off&obj.fluxsel=off&list.idsel=off"
         + "&obj.bibsel=off&list.bibsel=off&obj.messel=off&obj.notesel=off"
-        + "&Ident=", "HTTP/1.0\r\n\r\n", false),
+        + "&Ident=", null, "HTTP/1.1\r\nHost: simbad.u-strasbg.fr\r\n\r\n",
+            false),
 
-    // Queries the VizieR services at CADC. ** Removing this with s2147
-    // VIZIER_CADC("vizier", "vizier.hia.nrc.ca", 80, "/cgi-bin/nph-sesame/-o/V?", "HTTP/1.0\r\n\r\n", true),
+    // Queries the Sesame(only for vizier) service at CDS.
+    VIZIER("vizier", "cdsweb.u-strasbg.fr", 80,
+            HttpMethod.GET, "/cgi-bin/nph-sesame/-o/V?",
+            null, "HTTP/1.1\r\nHost: cdsweb.u-strasbg.fr\r\n\r\n", true);
 
-    // Queries the VizieR services at CDS.
-    VIZIER_CDS("vizier", "cdsweb.u-strasbg.fr", 80, "/cgi-bin/nph-sesame/-o/V?", "HTTP/1.0\r\n\r\n", true);
 
-
-    // Name used when referencing it in a business like manner, or as a request parameter.
+    // Name used when referencing it in a business like manner,
+    // or as a request parameter.
     private final String commonName;
 
     private final String host;
     private final int port;
+    private final HttpMethod method;
     private final String parameters;
+    private final String data;
 
     // HTTP information when connecting.
     private final String extraInfo;
@@ -110,12 +111,15 @@ public enum Service {
     private final boolean caseSensitiveFlag;
 
 
-    Service(final String commonName, final String host, int port, final String parameters, final String extraInfo,
-            final boolean caseSensitiveFlag) {
+    Service(final String commonName, final String host, int port,
+            final HttpMethod method, final String parameters, final String data,
+            final String extraInfo, final boolean caseSensitiveFlag) {
         this.commonName = commonName;
         this.host = host;
         this.port = port;
+        this.method = method;
         this.parameters = parameters;
+        this.data = data;
         this.extraInfo = extraInfo;
         this.caseSensitiveFlag = caseSensitiveFlag;
     }
@@ -132,9 +136,14 @@ public enum Service {
         return port;
     }
 
+    public HttpMethod getMethod() { return method; }
+
     public String getConnectString(final String target) {
-        return "GET " + parameters + NetUtil.encode(caseSensitiveFlag ? target : target.toLowerCase())
-            + " " + String.format(extraInfo, host);
+        if (this.method.equals(HttpMethod.GET)) {
+            return getGetConnectionString(target);
+        } else {
+            return getPostConnectionString(target);
+        }
     }
 
     public static Service valueOfFromHost(final String host) {
@@ -146,4 +155,39 @@ public enum Service {
 
         throw new IllegalArgumentException("No such Service for " + host);
     }
+
+    private String getGetConnectionString(final String target) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(HttpMethod.GET);
+        sb.append(" ");
+        sb.append(parameters);
+        sb.append(NetUtil.encode(caseSensitiveFlag ? target : target.toLowerCase()));
+        sb.append(" ");
+        sb.append(extraInfo);
+        return sb.toString();
+        //return method + " " + parameters + NetUtil.encode(caseSensitiveFlag ? target : target.toLowerCase())
+        //    + " " + String.format(extraInfo, host);
+    }
+
+    private String getPostConnectionString(final String target) {
+        String data = String.format("{\"name\":{\"v\":\"%s\"}}", target);
+        StringBuilder sb = new StringBuilder();
+        sb.append(HttpMethod.POST);
+        sb.append(" ");
+        sb.append(parameters);
+        sb.append(" HTTP/1.1\r\n");
+        sb.append("Host: ");
+        sb.append(host);
+        sb.append("\r\n");
+        sb.append("Content-Type: ");
+        sb.append(Format.JSON.contentType);
+        sb.append("\r\n");
+        sb.append("Content-Length: ");
+        sb.append(data.length());
+        sb.append("\r\n\r\n");
+        sb.append(data);
+        //sb.append("\r\n");
+        return sb.toString();
+    }
+
 }

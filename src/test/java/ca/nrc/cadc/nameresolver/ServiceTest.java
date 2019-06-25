@@ -84,7 +84,8 @@ public class ServiceTest
                      "GET /simbad/sim-id?output.max=1&output.format=ASCII&obj.coo1=on&obj.coo2=off"
                      + "&obj.coo3=off&obj.coo4=off&frame1=ICRS&epoch1=J2000&coodisp1=d&obj.pmsel=off&obj.plxsel=off"
                      + "&obj.rvsel=off&obj.spsel=off&obj.mtsel=on&obj.sizesel=off&obj.fluxsel=off&list.idsel=off"
-                     + "&obj.bibsel=off&list.bibsel=off&obj.messel=off&obj.notesel=off&Ident=v746+cas HTTP/1.0\r\n\r\n",
+                     + "&obj.bibsel=off&list.bibsel=off&obj.messel=off&obj.notesel=off&Ident=v746+cas "
+                     + "HTTP/1.1\r\nHost: simbad.u-strasbg.fr\r\n\r\n",
                      result);
     }
 }

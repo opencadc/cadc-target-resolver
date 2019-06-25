@@ -80,17 +80,22 @@ abstract class AbstractParserTest
 {
     String getTestFile(String filename) throws IOException
     {
+        return getTestFile(filename, true);
+    }
+
+    String getTestFile(String filename, boolean addLineBreaks)  throws IOException
+    {
         try (final BufferedReader br = new BufferedReader(new FileReader("src/test/resources/" + filename)))
         {
             StringBuilder sb = new StringBuilder();
             String line;
-
             while ((line = br.readLine()) != null)
             {
                 sb.append(line);
-                sb.append("\n");
+                if (addLineBreaks) {
+                    sb.append("\n");
+                }
             }
-
             return sb.toString();
         }
     }

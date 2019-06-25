@@ -81,8 +81,8 @@ import ca.nrc.cadc.util.CoordUtil;
  *
  * @author jburke
  */
-public class SIMBADParser extends DefaultParser implements Parser {
-    private static final Logger log = Logger.getLogger(SIMBADParser.class);
+public class SimbadParser extends DefaultParser implements Parser {
+    private static final Logger log = Logger.getLogger(SimbadParser.class);
 
     private static final String SIMBAD_ERROR_COMMENT = "!!";
     private static final String SIMBAD_ERROR_TARGET_NOT_FOUND = "Identifier not found";
@@ -107,7 +107,7 @@ public class SIMBADParser extends DefaultParser implements Parser {
      * @param host    the host name.
      * @param results the resolver results to parse.
      */
-    public SIMBADParser(final String target, final String host, final String results) {
+    public SimbadParser(final String target, final String host, final String results) {
         super(target, host, "Simbad", results);
     }
 
@@ -125,6 +125,8 @@ public class SIMBADParser extends DefaultParser implements Parser {
     @Override
     public TargetData parse()
         throws TargetDataParsingException {
+        log.debug("parsing...");
+        TargetData targetData = null;
         Double ra = null;
         Double dec = null;
         String name = null;
@@ -145,7 +147,7 @@ public class SIMBADParser extends DefaultParser implements Parser {
                     line.contains(SIMBAD_ERROR_COORD_QUERY) ||
                     line.contains(SIMBAD_ERROR_CATALOG_NOT_FOUND) ||
                     line.contains(SIMBAD_ERROR_CATALOG_INCORRECT_FORMAT)) {
-                    log.debug("Simbad query error: " + line);
+                    log.debug("returning null because " + line);
                     return null;
                 } else {
                     final String message = "Simbad error: " + line;
@@ -206,10 +208,10 @@ public class SIMBADParser extends DefaultParser implements Parser {
             }
         }
 
-        if (ra == null) {
-            return null;
-        } else {
-            return new TargetData(getTarget(), getHost(), getDatabase(), ra, dec, name, type, morphology);
+        if (ra != null) {
+            targetData =  new TargetData(getTarget(), getHost(), getDatabase(), ra, dec, name, type, morphology);
         }
+        log.debug("returning " + targetData);
+        return targetData;
     }
 }

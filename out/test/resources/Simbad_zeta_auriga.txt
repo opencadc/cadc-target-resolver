@@ -1,0 +1,26 @@
+C.D.S.  -  SIMBAD4 rel 1.218  -  2014.02.04CET21:18:04
+
+zeta auriga
+-----------
+
+Object V* zet Aur  ---  Al*  ---  OID=@741515   (@@22729,0)  ---  coobox=4377
+
+Coordinates(ICRS,ep=J2000,eq=2000): 075.61953078 +41.07583888 (Opt ) A [2.81 1.85 0] 2007A&A...474..653V
+Morphological type: ~ ~ ~
+
+Identifiers (37):
+   2MASS J05022869+4104329         PLX 1127                        SBC9 292                      
+   * zet Aur                       * 8 Aur                         AAVSO 0455+40                 
+   AG+41 504                       BD+40 1142                      CEL 510                       
+   FK5 1137                        GC 6137                         GCRV 2976                     
+   GEN# +1.00032068                GSC 02899-02236                 HD 32068                      
+   HD 32069                        HIC 23453                       HIP 23453                     
+   HR 1612                         IRAS 04589+4100                 IRC +40110                    
+   JP11 965                        LF 7 +40 172                    N30 1070                      
+   PMC 90-93 761                   PPM 47641                       RAFGL 674                     
+   ROT 709                         SAO 39966                       SBC7 201                      
+   SKY# 7891                       TD1 3847                        TYC 2899-2236-1               
+   UBV 21465                       UBV M 10543                     V* zet Aur                    
+   PLX 1127.00                                                                                   
+================================================================================
+

@@ -1,0 +1,24 @@
+C.D.S.  -  SIMBAD4 rel 1.7  -  2019.06.18CEST23:34:38
+
+m31
+---
+
+Object M 31  ---  G  ---  OID=@1575544   (@@143594,0)  ---  coobox=11643
+
+Coordinates(ICRS,ep=J2000,eq=2000): 010.684708 +41.268750 (IR  ) C [~ ~ ] 2006AJ....131.1163S
+hierarchy counts: #parents=3, #children=11080, #siblings=0
+Morphological type: SA(s)b  D 2013AJ....146...67B
+
+Identifiers (32):
+   2C 56                           DA 21                           GIN 801
+   IRAS F00400+4059                IRAS 00400+4059                 IRC +40013
+   K79 1C                          LEDA 2557                       M 31
+   MCG+07-02-016                   NAME Andromeda                  NAME Andromeda Galaxy
+   NGC 224                         RAFGL 104                       UGC 454
+   XSS J00425+4102                 Z 535-17                        Z 0040.0+4100
+   [DGW65] 4                       2MASX J00424433+4116074         [M98c] 004000.1+405943
+   [VV2000c] J004244.3+411610      [VV2003c] J004244.3+411610      [VV2006] J004244.3+411610
+   [VV98c] J004245.1+411622        UZC J004244.3+411608            [VV2010] J004244.3+411610
+   NAME And Nebula                 NAME Andromeda Nebula           2MAXI J0043+412
+   3FGL J0042.5+4117               2FGL J0042.5+4114
+================================================================================

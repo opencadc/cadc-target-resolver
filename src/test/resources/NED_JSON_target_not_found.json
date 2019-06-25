@@ -1,0 +1,13 @@
+{
+  "QueryTime": "Fri Feb 24 17:32:51 2017",
+  "Interpreted": {
+    "Name": "SN 1999",
+  },
+  "Copyright": "(C) 2017 California Institute of Technology",
+  "NameResolver": "NED-Egret",
+  "StatusCode": 100,
+  "Version": "2.0",
+  "Message": "Unknown name",
+  "Supplied": "SN1999",
+  "ResultCode": 2,
+}

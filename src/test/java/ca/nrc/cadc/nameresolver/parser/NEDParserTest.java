@@ -28,13 +28,15 @@
 
 package ca.nrc.cadc.nameresolver.parser;
 
+import static org.junit.Assert.*;
+
 import ca.nrc.cadc.nameresolver.Parser;
+import ca.nrc.cadc.nameresolver.Service;
 import ca.nrc.cadc.nameresolver.TargetData;
 import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
 import ca.nrc.cadc.util.Log4jInit;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -42,14 +44,15 @@ import org.junit.Test;
  *
  * @author jburke
  */
-public class SIMBADParserTest extends AbstractParserTest
+public class NEDParserTest extends AbstractParserTest
 {
-    private static final Logger log = Logger.getLogger(SIMBADParserTest.class);
+    private static final Logger log = Logger.getLogger(NEDParserTest.class);
     
     @BeforeClass
     public static void setUpClass() throws Exception
     {
         Log4jInit.setLevel("ca.nrc.cadc.nameresolver", Level.INFO);
+        Log4jInit.setLevel("ca.nrc.cadc.dali", Level.INFO);
     }
     
     @Override
@@ -61,48 +64,28 @@ public class SIMBADParserTest extends AbstractParserTest
     @Override
     protected String getHost()
     {
-        return "simbad.u-strasbg.fr";
+        return "ned.ipac.caltech.edu";
     }
     
     @Override
     protected String getDatabase()
     {
-        return "Simbad";
+        return Service.NED.getCommonName();
     }
 
     @Test
-    public void testTargetNotFound()
+    public void testInvalidJSON()
     {
         try
         {
-            String results = getTestFile("Simbad_target_not_found.txt");
-            
-            Parser parser = new SIMBADParser(getTarget(), getHost(), results);
-            assertNotNull(parser);
-            
-            TargetData data = parser.parse();
-            assertNull(data);
-        }
-        catch(Exception unexpected)
-        {
-            log.error("unexpected exception", unexpected);
-            fail("unexpected exception: " + unexpected);
-        }
-    }
-    
-    @Test
-    public void testError()
-    {
-        try
-        {
-            String results = getTestFile("Simbad_error.txt");
-            
-            Parser parser = new SIMBADParser(getTarget(), getHost(), results);
+            String results = getTestFile("NED_JSON_invalid.json", false);
+
+            Parser parser = new NEDParser(getTarget(), getHost(), results);
             assertNotNull(parser);
             try
             {
                 TargetData data = parser.parse();
-                fail("Error message should throw TargetDataParsingException");
+                fail("Invalid JSON should throw TargetDataParsingException");
             }
             catch (TargetDataParsingException e)
             { }
@@ -113,29 +96,19 @@ public class SIMBADParserTest extends AbstractParserTest
             fail("unexpected exception: " + unexpected);
         }
     }
-    
+
     @Test
-    public void testValidTarget_M31()
+    public void testTargetNotObjectName()
     {
         try
         {
-            String results = getTestFile("Simbad_hd_3145.txt");
-            
-            Parser parser = new SIMBADParser(getTarget(), getHost(), results);
+            String results = getTestFile("NED_JSON_not_object_name.json", false);
+
+            Parser parser = new NEDParser(getTarget(), getHost(), results);
             assertNotNull(parser);
-            
+
             TargetData data = parser.parse();
-            assertNotNull(data);
-            
-            assertEquals("Target did not match", getTarget(), data.getTarget());
-            assertEquals("Host did not match", getHost(), data.getHost());
-            assertEquals("Coordsys did not match", getCoordsys(), data.getCoordsys());
-            assertEquals("Database did not match", getDatabase(), data.getDatabase());
-            assertEquals("RA did not match", 120.56640246D, data.getRA(), 0.0);
-            assertEquals("Dec did not match", 02.33457005D, data.getDEC(), 0.0);
-            assertEquals("Object name did not match", "HR 3145", data.getObjectName());
-            assertEquals("Object type did not match", "*i*", data.getObjectType());
-            assertNull("Morphology type should be null", data.getMorphologyType());
+            assertNull(data);
         }
         catch(Exception unexpected)
         {
@@ -143,15 +116,55 @@ public class SIMBADParserTest extends AbstractParserTest
             fail("unexpected exception: " + unexpected);
         }
     }
-    
+
     @Test
-    public void testValidTarget_zeta_auriga()
+    public void testTargetAmbiguousName()
     {
         try
         {
-            String results = getTestFile("Simbad_zeta_auriga.txt");
+            String results = getTestFile("NED_JSON_ambiguous_name.json", false);
+
+            Parser parser = new NEDParser(getTarget(), getHost(), results);
+            assertNotNull(parser);
+
+            TargetData data = parser.parse();
+            assertNull(data);
+        }
+        catch(Exception unexpected)
+        {
+            log.error("unexpected exception", unexpected);
+            fail("unexpected exception: " + unexpected);
+        }
+    }
+
+    @Test
+    public void testTargetNotFound()
+    {
+        try
+        {
+            String results = getTestFile("NED_JSON_target_not_found.json", false);
+
+            Parser parser = new NEDParser(getTarget(), getHost(), results);
+            assertNotNull(parser);
+
+            TargetData data = parser.parse();
+            assertNull(data);
+        }
+        catch(Exception unexpected)
+        {
+            log.error("unexpected exception", unexpected);
+            fail("unexpected exception: " + unexpected);
+        }
+    }
+
+    @Test
+    public void testValidTarget_M31()
+    {
+        try
+        {
+            String results = getTestFile("NED_JSON_m31.json", false);
             
-            Parser parser = new SIMBADParser(getTarget(), getHost(), results);
+            Parser parser = new NEDParser(getTarget(), getHost(), results);
             assertNotNull(parser);
             
             TargetData data = parser.parse();
@@ -161,10 +174,10 @@ public class SIMBADParserTest extends AbstractParserTest
             assertEquals("Host did not match", getHost(), data.getHost());
             assertEquals("Coordsys did not match", getCoordsys(), data.getCoordsys());
             assertEquals("Database did not match", getDatabase(), data.getDatabase());
-            assertEquals("RA did not match", 075.61953078D, data.getRA(), 0.0);
-            assertEquals("Dec did not match", 41.07583888D, data.getDEC(), 0.0);
-            assertEquals("Object name did not match", "V* zet Aur", data.getObjectName());
-            assertEquals("Object type did not match", "Al*", data.getObjectType());
+            assertEquals("RA did not match", 10.68479292D, data.getRA(), 0.0);
+            assertEquals("Dec did not match", 41.269065D, data.getDEC(), 0.0);
+            assertEquals("Object name did not match", "MESSIER 031", data.getObjectName());
+            assertEquals("Object type did not match", "G", data.getObjectType());
             assertNull("Morphology type should be null", data.getMorphologyType());
         }
         catch(Exception unexpected)
@@ -174,4 +187,64 @@ public class SIMBADParserTest extends AbstractParserTest
         }
     }
 
+    @Test
+    public void testValidTarget_NGC_6341()
+    {
+        try
+        {
+            String results = getTestFile("NED_JSON_NGC_6341.json", false);
+            
+            Parser parser = new NEDParser(getTarget(), getHost(), results);
+            assertNotNull(parser);
+            
+            TargetData data = parser.parse();
+            assertNotNull(data);
+            
+            assertEquals("Target did not match", getTarget(), data.getTarget());
+            assertEquals("Host did not match", getHost(), data.getHost());
+            assertEquals("Coordsys did not match", getCoordsys(), data.getCoordsys());
+            assertEquals("Database did not match", getDatabase(), data.getDatabase());
+            assertEquals("RA did not match", 259.2802946D, data.getRA(), 0.0);
+            assertEquals("Dec did not match", 43.13652314D, data.getDEC(), 0.0);
+            assertEquals("Object name did not match", "MESSIER 092", data.getObjectName());
+            assertEquals("Object type did not match", "*Cl", data.getObjectType());
+            assertNull("Morphology type should be null", data.getMorphologyType());
+        }
+        catch(Exception unexpected)
+        {
+            log.error("unexpected exception", unexpected);
+            fail("unexpected exception: " + unexpected);
+        }
+    }
+
+    @Test
+    public void testValidTarget_NGC_7293()
+    {
+        try
+        {
+            String results = getTestFile("NED_JSON_NGC_7293.json", false);
+            
+            Parser parser = new NEDParser(getTarget(), getHost(), results);
+            assertNotNull(parser);
+            
+            TargetData data = parser.parse();
+            assertNotNull(data);
+            
+            assertEquals("Target did not match", getTarget(), data.getTarget());
+            assertEquals("Host did not match", getHost(), data.getHost());
+            assertEquals("Coordsys did not match", getCoordsys(), data.getCoordsys());
+            assertEquals("Database did not match", getDatabase(), data.getDatabase());
+            assertEquals("RA did not match", 337.4107071D, data.getRA(), 0.0);
+            assertEquals("Dec did not match", -20.83733778D, data.getDEC(), 0.0);
+            assertEquals("Object name did not match", "NGC 7293", data.getObjectName());
+            assertEquals("Object type did not match", "PN", data.getObjectType());
+            assertNull("Morphology type should be null", data.getMorphologyType());
+        }
+        catch(Exception unexpected)
+        {
+            log.error("unexpected exception", unexpected);
+            fail("unexpected exception: " + unexpected);
+        }
+    }
+    
 }
