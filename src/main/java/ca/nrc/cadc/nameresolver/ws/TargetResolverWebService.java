@@ -90,7 +90,7 @@ public class TargetResolverWebService implements AvailabilityPlugin {
     public TargetResolverWebService() {
         testNameValues.put(Service.NED, "m17");
         testNameValues.put(Service.SIMBAD, "M17");
-        testNameValues.put(Service.VIZIER, NetUtil.encode("NGC 4321"));
+        testNameValues.put(Service.VIZIER, NetUtil.encode("HD 79158"));
     }
 
     /**

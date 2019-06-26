@@ -129,10 +129,6 @@
         <td nowrap="true"><a href="http://vizier.u-strasbg.fr/viz-bin/VizieR">VizieR</a></td>
         <td>The VizieR service at CDS.</td>
       </tr>
-      <tr class="even_b">
-        <td nowrap="true"><a href="http://vizier.hia.nrc.ca/viz-bin/VizieR">VizieR</a></td>
-        <td>The VizieR service at the Canadian Astronomy Data Centre (CADC).</td>
-      </tr>
     </table>
   </div>
 
@@ -166,7 +162,7 @@
           all - queries the NED, Simbad, and VizieR services concurrently.<br/>
           ned - queries the NED service at CalTech.<br/>
           simbad - queries the SIMBAD service at CDS.<br/>
-          vizier - queries the VizieR services at CADC and CDS.
+          vizier - queries the VizieR services at CDS.
         </td>
       </tr>
       <tr class="odd_b">
