@@ -150,4 +150,10 @@ public class TargetResolverWebService implements AvailabilityPlugin {
     public void setState(final String state) {
         // Does nothing.
     }
+    
+    @Override
+    public boolean heartbeat() {
+        return true;
+    }
+
 }
