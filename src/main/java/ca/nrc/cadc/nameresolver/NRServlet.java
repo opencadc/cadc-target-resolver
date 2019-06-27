@@ -629,7 +629,6 @@ public class NRServlet extends HttpServlet {
                 final Service service = Service.valueOfFromHost(host);
                 final String connectString = service.getConnectString(target);
                 ByteBuffer encoded = encoder.encode(CharBuffer.wrap(connectString));
-                long bytes = channel.write(encoded);
                 LOGGER.debug(String.format("%s - %s", host, connectString));
             }
             channel.register(selector, SelectionKey.OP_READ);
