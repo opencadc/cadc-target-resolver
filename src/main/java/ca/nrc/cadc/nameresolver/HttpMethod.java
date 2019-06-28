@@ -3,7 +3,7 @@
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2017.                            (c) 2017.
+ *  (c) 2019.                            (c) 2019.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -68,24 +68,12 @@
 
 package ca.nrc.cadc.nameresolver;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+enum HttpMethod {
+    GET("GET"), POST("POST");
 
+    final String method;
 
-public class ServiceTest
-{
-    @Test
-    public void getConnectString() throws Exception
-    {
-        final Service testSubject = Service.SIMBAD;
-
-        final String result = testSubject.getConnectString("V746 Cas");
-        assertEquals("Wrong encoded result.",
-                     "GET /simbad/sim-id?output.max=1&output.format=ASCII&obj.coo1=on&obj.coo2=off"
-                     + "&obj.coo3=off&obj.coo4=off&frame1=ICRS&epoch1=J2000&coodisp1=d&obj.pmsel=off&obj.plxsel=off"
-                     + "&obj.rvsel=off&obj.spsel=off&obj.mtsel=on&obj.sizesel=off&obj.fluxsel=off&list.idsel=off"
-                     + "&obj.bibsel=off&list.bibsel=off&obj.messel=off&obj.notesel=off&Ident=v746+cas "
-                     + "HTTP/1.1\r\nHost: simbad.u-strasbg.fr\r\n\r\n",
-                     result);
+    HttpMethod(String method) {
+        this.method = method;
     }
 }

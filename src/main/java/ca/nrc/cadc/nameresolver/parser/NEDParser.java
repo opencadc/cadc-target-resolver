@@ -3,7 +3,7 @@
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2017.                            (c) 2017.
+ *  (c) 2019.                            (c) 2019.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -68,35 +68,40 @@
 
 package ca.nrc.cadc.nameresolver.parser;
 
-import ca.nrc.cadc.dali.tables.TableData;
-import ca.nrc.cadc.dali.tables.votable.VOTableDocument;
-import ca.nrc.cadc.dali.tables.votable.VOTableField;
-import ca.nrc.cadc.dali.tables.votable.VOTableParam;
-import ca.nrc.cadc.dali.tables.votable.VOTableReader;
-import ca.nrc.cadc.dali.tables.votable.VOTableResource;
-import ca.nrc.cadc.dali.tables.votable.VOTableTable;
 import ca.nrc.cadc.nameresolver.Parser;
+import ca.nrc.cadc.nameresolver.Service;
 import ca.nrc.cadc.nameresolver.TargetData;
 import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
-
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-
+import java.util.*;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
- * Parses the VOTable results from a NED target query. The results are parsed using the VOTable pull parser from CDS.
+ * Parses the json results from a NED target query.
  *
  * @author jburke
  */
-public class NedParser extends DefaultParser implements Parser {
-    private final static Logger log = Logger.getLogger(NedParser.class);
+public class NEDParser extends DefaultParser implements Parser {
+    private final static Logger log = Logger.getLogger(NEDParser.class);
 
-    private static final String RA_FIELD_NAME = "RA";
-    private static final String DEC_FIELD_NAME = "DEC";
-    private static final String NAME_FIELD_NAME = "Object Name";
-    private static final String TYPE_FIELD_NAME = "Type";
+    private final static double SUPPORTED_NED_VERSION = 2.0;
+
+    private static Map<Integer, String> resultCodes =
+            new TreeMap<Integer, String>();
+    static {
+        resultCodes.put(0, "Not an object name: the supplied string could not "
+                + "be interpreted as the as a valid object name.");
+        resultCodes.put(1, "Ambiguous name: the input was a valid but "
+                + "unspecific name: a list of possibly intended aliases "
+                + "is return.");
+        resultCodes.put(2, "Valid name:  the input provided was interpreted as "
+                + "a proper object name, but there is no such object known in "
+                + "NED (it may be very new, or we may the NED standard form "
+                + "is returned.");
+        resultCodes.put(3, "Known name: the input provided was interpreted as "
+                + "a proper object name that was known to NED.");
+    }
 
     /**
      * Constructs a new NEDResolver thread initialized with the specified
@@ -106,99 +111,70 @@ public class NedParser extends DefaultParser implements Parser {
      * @param host    the host name.
      * @param results the resolver results to parse.
      */
-    public NedParser(String target, String host, String results) {
-        super(target, host, "NED", results);
+    public NEDParser(String target, String host, String results) {
+        super(target, host, Service.NED.getCommonName(), results);
     }
 
     public TargetData parse() throws TargetDataParsingException {
-        // Find the start of the XML data
-        String results = getResults();
-        int index = results.indexOf("<?xml");
-        if (index == -1) {
-            throw new TargetDataParsingException("VOTABLE not found in " + results);
-        }
-
-        final VOTableReader reader = new VOTableReader(false);
-        final VOTableDocument votable;
-        try {
-            votable = reader.read(results.substring(index));
-        } catch (IOException e) {
-            final String message = "error reading NED VOTABLE because " + e.getMessage();
-            throw new TargetDataParsingException(message);
-        }
-
-        List<VOTableResource> resources = votable.getResources();
-        if (resources.isEmpty()) {
-            final String message = "NED VOTable does not contain a resource element";
-            log.debug(message + "\n" + getResults());
-            throw new TargetDataParsingException(message);
-        }
-
-        final VOTableResource resource = resources.get(0);
-
-        for (VOTableParam param : resource.getParams()) {
-            if (param.getName().equalsIgnoreCase("error")) {
-                log.debug("Target not found in " + getDatabase());
-                return null;
-            }
-        }
-
-        VOTableTable table = resource.getTable();
-        if (table == null) {
-            final String message = "NED VOTable resource table not found";
-            log.debug(message + "\n" + getResults());
-            throw new TargetDataParsingException(message);
-        }
-
-        TableData tableData = table.getTableData();
-        if (tableData == null) {
-            final String message = "Parsing error, NED VOTable table data not found";
-            log.debug(message + "\n" + getResults());
-            throw new TargetDataParsingException(message);
-        }
-
-        List<VOTableField> fields = table.getFields();
-        if (fields.isEmpty()) {
-            final String message = "Parsing error, NED VOTable data fields not found";
-            log.debug(message + "\n" + getResults());
-            throw new TargetDataParsingException(message);
-        }
-
-        Iterator<List<Object>> iterator = tableData.iterator();
-        if (!iterator.hasNext()) {
-            final String message = "Parsing error, NED VOTable data is empty";
-            log.debug(message + "\n" + getResults());
-            throw new TargetDataParsingException(message);
-        }
-
+        log.debug("parsing...");
         TargetData targetData = null;
         Double ra = null;
         Double dec = null;
         String oname = null;
         String otype = null;
-        List<Object> data = iterator.next();
-        for (int i = 0; i < fields.size(); i++) {
-            final VOTableField field = fields.get(i);
-            try {
-                final Object value = data.get(i);
-                if (RA_FIELD_NAME.equals(field.getName())) {
-                    ra = (Double) value;
-                } else if (DEC_FIELD_NAME.equals(field.getName())) {
-                    dec = (Double) value;
-                } else if (NAME_FIELD_NAME.equals(field.getName())) {
-                    oname = (String) value;
-                } else if (TYPE_FIELD_NAME.equals(field.getName())) {
-                    otype = (String) value;
+
+        String[] lines = getResults().split("\n");
+        for (String line : lines) {
+            if (line != null && line.trim().startsWith("{")) {
+                try {
+                    JSONObject json = new JSONObject(line);
+
+                    // check version of returned json
+                    checkVersion(json.getDouble("Version"));
+
+                    int resultCode = json.getInt("ResultCode");
+                    if (resultCode == 3) {
+
+                        JSONObject preferred = json.getJSONObject("Preferred");
+
+                        // Object name
+                        oname = preferred.getString("Name");
+
+                        //Object type
+                        JSONObject objectType = preferred.getJSONObject("ObjType");
+                        otype = objectType.getString("Value");
+
+                        // ra & dec
+                        JSONObject position = preferred.getJSONObject("Position");
+                        ra = position.getDouble("RA");
+                        dec = position.getDouble("Dec");
+                    } else {
+                        log.debug(String.format("Result code %d: %s", resultCode,
+                                resultCodes.get(resultCode)));
+                    }
+                    break;
+                } catch (JSONException e) {
+                    final String message = String.format("Unable to parse NED json\n\n'%s'\n\nbecause\n\n%s",
+                            getResults(), e.getMessage());
+                    throw new TargetDataParsingException(message);
                 }
-            } catch (NumberFormatException nfe) {
-                final String message = "NED number format exception: " + nfe.getMessage();
-                log.debug(message + "\n" + getResults());
-                throw new TargetDataParsingException(message);
             }
         }
         if (ra != null && dec != null) {
-            targetData = new TargetData(getTarget(), getHost(), getDatabase(), ra, dec, oname, otype, null);
+            targetData = new TargetData(getTarget(), getHost(), getDatabase(),
+                    ra, dec, oname, otype, null);
         }
+        log.debug("returning " + targetData);
         return targetData;
     }
+
+    private void checkVersion(final Double version) {
+        if (version != SUPPORTED_NED_VERSION) {
+            final String error = String.format("The current supported version "
+                    + "%s does not match the returned version: %s",
+                    SUPPORTED_NED_VERSION, version);
+            log.error(error);
+        }
+    }
+
 }

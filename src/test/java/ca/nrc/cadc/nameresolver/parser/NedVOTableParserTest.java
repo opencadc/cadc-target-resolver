@@ -46,9 +46,9 @@ import static org.junit.Assert.fail;
  *
  * @author jburke
  */
-public class NedParserTest extends AbstractParserTest
+public class NedVOTableParserTest extends AbstractParserTest
 {
-    private static final Logger log = Logger.getLogger(NedParserTest.class);
+    private static final Logger log = Logger.getLogger(NedVOTableParserTest.class);
     
     @BeforeClass
     public static void setUpClass() throws Exception
@@ -82,7 +82,7 @@ public class NedParserTest extends AbstractParserTest
         {
             String results = getTestFile("NED_VOTable_target_not_found.xml");
             
-            Parser parser = new NedParser(getTarget(), getHost(), results);
+            Parser parser = new NedVOTableParser(getTarget(), getHost(), results);
             assertNotNull(parser);
             
             TargetData data = parser.parse();
@@ -102,7 +102,7 @@ public class NedParserTest extends AbstractParserTest
         {
             String results = getTestFile("NED_VOTable_invalid.xml");
             
-            Parser parser = new NedParser(getTarget(), getHost(), results);
+            Parser parser = new NedVOTableParser(getTarget(), getHost(), results);
             assertNotNull(parser);
             try
             {
@@ -126,7 +126,7 @@ public class NedParserTest extends AbstractParserTest
         {
             String results = getTestFile("NED_VOTable_m31.xml");
             
-            Parser parser = new NedParser(getTarget(), getHost(), results);
+            Parser parser = new NedVOTableParser(getTarget(), getHost(), results);
             assertNotNull(parser);
             
             TargetData data = parser.parse();
@@ -156,7 +156,7 @@ public class NedParserTest extends AbstractParserTest
         {
             String results = getTestFile("NED_VOTable_NGC_6341.xml");
             
-            Parser parser = new NedParser(getTarget(), getHost(), results);
+            Parser parser = new NedVOTableParser(getTarget(), getHost(), results);
             assertNotNull(parser);
             
             TargetData data = parser.parse();
@@ -186,7 +186,7 @@ public class NedParserTest extends AbstractParserTest
         {
             String results = getTestFile("NED_VOTable_NGC_7293.xml");
             
-            Parser parser = new NedParser(getTarget(), getHost(), results);
+            Parser parser = new NedVOTableParser(getTarget(), getHost(), results);
             assertNotNull(parser);
             
             TargetData data = parser.parse();

@@ -69,9 +69,7 @@
 package ca.nrc.cadc.nameresolver;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -88,22 +86,17 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.nio.channels.Selector;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.easymock.EasyMock.*;
 
 
-public class NRServletTest
-{
+public class NRServletTest {
     @Test
-    public void doGetJSON() throws Exception
-    {
+    public void doGetJSON() throws Exception {
         final TargetData td = new TargetData("m88", "myhost.com", "ned", 88.0d, 99.0d,
                                              "myobject", "objecttype", "mtype");
 
-        final NRServlet testSubject = new NRServlet()
-        {
+        final NRServlet testSubject = new NRServlet() {
             /**
              * Create a socket channel with the given host and register connect interest with the selector.
              * <p>
@@ -114,8 +107,7 @@ public class NRServletTest
              * @param port     The port number.
              */
             @Override
-            void createChannel(Selector selector, String host, int port)
-            {
+            void createChannel(Selector selector, String host, int port) {
                 // Do nothing.
             }
 
@@ -128,8 +120,7 @@ public class NRServletTest
              * @param url      the URL to use
              */
             @Override
-            void createChannel(Selector selector, URL url)
-            {
+            void createChannel(Selector selector, URL url) {
 
             }
 
@@ -141,12 +132,12 @@ public class NRServletTest
              * Allow tests to override.
              *
              * @param selector the selector
+             * @param services list of services to query
              * @param target   the target name to resolve
              * @return TargetData with the target coordinates
              */
             @Override
-            TargetData queryServices(Selector selector, String target)
-            {
+            TargetData queryServices(Selector selector, Collection services, String target) {
                 return td;
             }
         };
@@ -196,13 +187,11 @@ public class NRServletTest
     }
 
     @Test
-    public void doGetASCII() throws Exception
-    {
+    public void doGetASCII() throws Exception {
         final TargetData td = new TargetData("m88", "myhost.com", "ned", 88.0d, 99.0d,
                                              "myobject", "objecttype", "mtype");
 
-        final NRServlet testSubject = new NRServlet()
-        {
+        final NRServlet testSubject = new NRServlet() {
             /**
              * Create a socket channel with the given host and register connect interest with the selector.
              * <p>
@@ -213,8 +202,7 @@ public class NRServletTest
              * @param port     The port number.
              */
             @Override
-            void createChannel(Selector selector, String host, int port)
-            {
+            void createChannel(Selector selector, String host, int port) {
                 // Do nothing.
             }
 
@@ -227,8 +215,7 @@ public class NRServletTest
              * @param url      the URL to use
              */
             @Override
-            void createChannel(Selector selector, URL url)
-            {
+            void createChannel(Selector selector, URL url) {
                 // Do nothing.
             }
 
@@ -240,12 +227,12 @@ public class NRServletTest
              * Allow tests to override.
              *
              * @param selector the selector
+             * @param services list of services to query
              * @param target   the target name to resolve
              * @return TargetData with the target coordinates
              */
             @Override
-            TargetData queryServices(Selector selector, String target)
-            {
+            TargetData queryServices(Selector selector, Collection services, String target) {
                 return td;
             }
         };
@@ -291,8 +278,7 @@ public class NRServletTest
     }
 
     @Test
-    public void lookupWithCommaRadius() throws Exception
-    {
+    public void lookupWithCommaRadius() throws Exception {
         final TargetData td = new TargetData("M31", "myhost.com", "ned", 88.0d, 99.0d,
                                              "myobject", "objecttype", "mtype");
         final String target = "M31, 0.5";
@@ -310,12 +296,9 @@ public class NRServletTest
             TargetData tryLookup(TargetResolverRequest targetResolverRequest) throws IOException
             {
                 // Only return the target data is the one minus the radius is passed in.
-                if (targetResolverRequest.target.equals(td.getTarget()))
-                {
+                if (targetResolverRequest.target.equals(td.getTarget())) {
                     return td;
-                }
-                else
-                {
+                } else {
                     return null;
                 }
             }
@@ -328,8 +311,7 @@ public class NRServletTest
     }
 
     @Test
-    public void lookupWithSpaceRadius() throws Exception
-    {
+    public void lookupWithSpaceRadius() throws Exception {
         final TargetData td = new TargetData("M31", "myhost.com", "ned", 88.0d, 99.0d,
                                              "myobject", "objecttype", "mtype");
         final String target = "M31 0.5";
@@ -347,12 +329,9 @@ public class NRServletTest
             TargetData tryLookup(TargetResolverRequest targetResolverRequest) throws IOException
             {
                 // Only return the target data is the one minus the radius is passed in.
-                if (targetResolverRequest.target.equals(td.getTarget()))
-                {
+                if (targetResolverRequest.target.equals(td.getTarget())) {
                     return td;
-                }
-                else
-                {
+                } else {
                     return null;
                 }
             }
@@ -363,4 +342,71 @@ public class NRServletTest
         final TargetData result = testSubject.exhaustiveLookup(targetResolverRequest);
         Assert.assertEquals("Wrong target.", "M31", result.getTarget());
     }
+
+    @Test
+    public void getTargetData() throws Exception {
+
+        final NRServlet testSubject = new NRServlet();
+        Map<Service, TargetData> serviceData = new HashMap<Service, TargetData>(4);
+        TargetData targetData;
+
+        // Return null
+        targetData = testSubject.getTargetData(serviceData, System.currentTimeMillis());
+        Assert.assertNull(targetData);
+
+        // NED returns first
+        serviceData.put(Service.NED, new TargetData("NED"));
+        targetData = testSubject.getTargetData(serviceData, System.currentTimeMillis());
+        Assert.assertNotNull(targetData);
+        Assert.assertEquals("NED", targetData.getErrorMessage());
+
+        // Simbad returns first
+        serviceData.clear();
+        serviceData.put(Service.SIMBAD, new TargetData("Simbad"));
+        targetData = testSubject.getTargetData(serviceData, System.currentTimeMillis());
+        Assert.assertNotNull(targetData);
+        Assert.assertEquals("Simbad", targetData.getErrorMessage());
+
+        // NED or Simbad return after Sesame but before timeout
+        serviceData.clear();
+        serviceData.put(Service.NED, new TargetData("NED"));
+        serviceData.put(Service.SIMBAD, new TargetData("Simbad"));
+        serviceData.put(Service.VIZIER, new TargetData("Vizier"));
+        targetData = testSubject.getTargetData(serviceData, System.currentTimeMillis());
+        Assert.assertNotNull(targetData);
+        Assert.assertEquals("NED", targetData.getErrorMessage());
+
+        // NED or Simbad have not returned before timeout but Sesame has
+        serviceData.clear();
+        serviceData.put(Service.VIZIER, new TargetData("Vizier"));
+        targetData = testSubject.getTargetData(serviceData, System.currentTimeMillis());
+        Assert.assertNull(targetData);
+
+        // NED or Simbad have not returned after timeout
+        serviceData.clear();
+        long start = System.currentTimeMillis() - 6000L; // 6 secs ago
+        serviceData.put(Service.VIZIER, new TargetData("Vizier"));
+        targetData = testSubject.getTargetData(serviceData, start);
+        Assert.assertNotNull(targetData);
+        Assert.assertEquals("Vizier", targetData.getErrorMessage());
+
+        // NED or Simbad returned not found before timeout
+        serviceData.clear();
+        serviceData.put(Service.NED, null);
+        serviceData.put(Service.SIMBAD, null);
+        serviceData.put(Service.VIZIER, new TargetData("Vizier"));
+        targetData = testSubject.getTargetData(serviceData, System.currentTimeMillis());
+        Assert.assertNotNull(targetData);
+        Assert.assertEquals("Vizier", targetData.getErrorMessage());
+
+        // NED or Simbad returned not found after timeout
+        serviceData.clear();
+        serviceData.put(Service.NED, null);
+        serviceData.put(Service.SIMBAD, null);
+        serviceData.put(Service.VIZIER, new TargetData("Vizier"));
+        targetData = testSubject.getTargetData(serviceData, System.currentTimeMillis());
+        Assert.assertNotNull(targetData);
+        Assert.assertEquals("Vizier", targetData.getErrorMessage());
+    }
+
 }

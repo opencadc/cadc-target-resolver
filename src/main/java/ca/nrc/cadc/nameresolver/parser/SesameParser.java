@@ -112,6 +112,7 @@ public class SesameParser extends DefaultParser implements Parser {
      */
     @Override
     public TargetData parse() throws TargetDataParsingException {
+        log.debug("parsing...");
         TargetData targetData = null;
         String[] lines = getResults().split("\n");
 
@@ -156,6 +157,7 @@ public class SesameParser extends DefaultParser implements Parser {
                 }
             }
         }
+        log.debug("returning " + targetData);
         return targetData;
     }
 

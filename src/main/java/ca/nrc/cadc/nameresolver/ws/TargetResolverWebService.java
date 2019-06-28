@@ -90,9 +90,7 @@ public class TargetResolverWebService implements AvailabilityPlugin {
     public TargetResolverWebService() {
         testNameValues.put(Service.NED, "m17");
         testNameValues.put(Service.SIMBAD, "M17");
-        testNameValues.put(Service.VIZIER_CDS, NetUtil.encode("NGC 4321"));
-        // Removing this with s2147
-        // testNameValues.put(Service.VIZIER_CADC, NetUtil.encode("NGC 4321"));
+        testNameValues.put(Service.VIZIER, NetUtil.encode("HD 79158"));
     }
 
     /**
@@ -152,4 +150,10 @@ public class TargetResolverWebService implements AvailabilityPlugin {
     public void setState(final String state) {
         // Does nothing.
     }
+    
+    @Override
+    public boolean heartbeat() {
+        return true;
+    }
+
 }
