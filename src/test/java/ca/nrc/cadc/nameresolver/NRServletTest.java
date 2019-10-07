@@ -140,6 +140,10 @@ public class NRServletTest {
             TargetData queryServices(Selector selector, Collection services, String target) {
                 return td;
             }
+            @Override
+            public String getServletName() {
+                return "servlet_name";
+            }
         };
 
         final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
@@ -160,12 +164,13 @@ public class NRServletTest {
         mockResponse.setContentType("application/json");
         expectLastCall().once();
 
+        expect(mockRequest.getContextPath()).andReturn("servlet_name");
+        expect(mockRequest.getServletPath()).andReturn(("servlet_path"));
         expect(mockRequest.getPathInfo()).andReturn("/test/info").once();
         expect(mockRequest.getMethod()).andReturn("GET").once();
         expect(mockRequest.getHeader(NetUtil.FORWARDED_FOR_CLIENT_IP_HEADER)).andReturn("192.168.89.9").once();
         expect(mockRequest.getQueryString()).andReturn("target=m88&format=json").once();
         expect(mockRequest.getParameterMap()).andReturn(paramMap).once();
-        expect(mockRequest.getParameterNames()).andReturn(paramNames).once();
 
         replay(mockRequest, mockResponse);
 
@@ -235,6 +240,10 @@ public class NRServletTest {
             TargetData queryServices(Selector selector, Collection services, String target) {
                 return td;
             }
+            @Override
+            public String getServletName() {
+                return "servlet_name";
+            }
         };
 
         final HttpServletRequest mockRequest = createMock(HttpServletRequest.class);
@@ -255,12 +264,12 @@ public class NRServletTest {
         mockResponse.setContentType("text/plain");
         expectLastCall().once();
 
+        expect(mockRequest.getContextPath()).andReturn("servlet_name");
+        expect(mockRequest.getServletPath()).andReturn(("servlet_path"));
         expect(mockRequest.getPathInfo()).andReturn("/test/info").once();
         expect(mockRequest.getMethod()).andReturn("GET").once();
-        expect(mockRequest.getHeader(NetUtil.FORWARDED_FOR_CLIENT_IP_HEADER)).andReturn(null).once();
-        expect(mockRequest.getRemoteAddr()).andReturn("192.168.3.3").once();
-        expect(mockRequest.getParameterNames()).andReturn(paramNames).once();
-        expect(mockRequest.getQueryString()).andReturn("target=m88&format=ascii").once();
+        expect(mockRequest.getHeader(NetUtil.FORWARDED_FOR_CLIENT_IP_HEADER)).andReturn("192.168.89.9").once();
+        expect(mockRequest.getQueryString()).andReturn("target=m88&format=json").once();
         expect(mockRequest.getParameterMap()).andReturn(paramMap).once();
 
         replay(mockRequest, mockResponse);
