@@ -155,7 +155,7 @@ public class NRServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         long start = System.currentTimeMillis();
-        WebServiceLogInfo logInfo = new ServletLogInfo(request, this.getClass());
+        WebServiceLogInfo logInfo = new ServletLogInfo(request);
         LOGGER.info(logInfo.start());
 
         String message;
