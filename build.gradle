@@ -11,7 +11,7 @@ repositories {
 
 sourceCompatibility = 1.7
 group = 'org.opencadc'
-version = '1016'
+version = '1017'
 
 war {
     archiveName = project.name + '##' + project.version + '.war'
@@ -24,6 +24,12 @@ sourceSets {
 configurations {
     intTestCompile.extendsFrom(testCompile)
     intTestRuntime.extendsFrom(testRuntime)
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'javax.servlet:javax.servlet-api:3.1.0'
+    }
 }
 
 idea {
@@ -41,10 +47,10 @@ dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.+'
 
     compile 'org.opencadc:cadc-dali:1.+'
-    compile 'org.opencadc:cadc-util:[1.0.5,)'
-    compile 'org.opencadc:cadc-log:1.+'
-    compile 'org.opencadc:cadc-vosi:1.+'
-    compile 'org.opencadc:caom2-search-lib:[2.3.1, )'
+    compile 'org.opencadc:cadc-util:[1.2.25,)'
+    compile 'org.opencadc:cadc-log:[1.1.0,)'
+    compile 'org.opencadc:cadc-vosi:[1.3.1,)'
+    compile 'org.opencadc:caom2-search-lib:[2.3.1,)'
 
     runtime 'jstl:jstl:1.2+'
 
