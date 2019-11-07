@@ -26,6 +26,12 @@ configurations {
     intTestRuntime.extendsFrom(testRuntime)
 }
 
+configurations.all {
+    resolutionStrategy {
+        force 'javax.servlet:javax.servlet-api:3.1.0'
+    }
+}
+
 idea {
     module {
         //and some extra test source dirs
