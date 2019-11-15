@@ -16,8 +16,4 @@ jobs:
       - name: Build with Gradle
         run: gradle -i clean build test
       - name: Build the Docker image
-        run:
-          - mkdir docker
-          - cp Dockerfile docker/
-          - cp build/libs/*.war docker/
-          - docker build -t opencadc/cadc-target-resolver:SNAPSHOT -t opencadc/cadc-target-resolver:alpine -t opencadc/cadc-target-resolver:${VERSION} -f docker/Dockerfile docker/
+        run: mkdir docker && cp Dockerfile docker/ && cp build/libs/*.war docker/ && docker build -t opencadc/cadc-target-resolver:SNAPSHOT -t opencadc/cadc-target-resolver:alpine -t opencadc/cadc-target-resolver:${VERSION} -f docker/Dockerfile docker/
