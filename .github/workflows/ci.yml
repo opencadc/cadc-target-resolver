@@ -1,4 +1,4 @@
-name: Java CI
+name: Java/Docker CI
 
 on: [push]
 
@@ -17,5 +17,7 @@ jobs:
         run: gradle -i clean build test
       - name: Build the Docker image
         run: mkdir docker && cp Dockerfile docker/ && cp build/libs/*.war docker/ && docker build -t opencadc/cadc-target-resolver:SNAPSHOT -t opencadc/cadc-target-resolver:alpine -t opencadc/cadc-target-resolver -f docker/Dockerfile docker/
-      - name: Docker Compose
-        run: docker-compose --version
+      - name: Prepare for Integration Test
+        run: docker-compose -f integrationTest/docker-compose.yml up -d && docker ps -a && docker-compose -f integrationTest/docker-compose.yml logs cadc-target-resolver.cadc.dao.nrc.ca docker-compose -f integrationTest/docker-compose.yml logs proxy.cadc.dao.nrc.ca
+      - name: Execute Integration Tests
+        run: curl -vL -d 'level=DEBUG' http://proxy.cadc.dao.nrc.ca/cadc-target-resolver/logControl && gradle -i -Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca clean intTest
