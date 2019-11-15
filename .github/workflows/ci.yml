@@ -20,4 +20,4 @@ jobs:
       - name: Prepare for Integration Test
         run: docker-compose -f integrationTest/docker-compose.yml up -d && docker ps -a && docker-compose -f integrationTest/docker-compose.yml logs cadc-target-resolver.cadc.dao.nrc.ca && docker-compose -f integrationTest/docker-compose.yml logs proxy.cadc.dao.nrc.ca
       - name: Execute Integration Tests
-        run: curl -vL -d 'level=DEBUG' http://localhost/cadc-target-resolver/logControl && gradle -i -Dca.nrc.cadc.reg.client.RegistryClient.local=true clean intTest
+        run: curl -vL -d 'level=DEBUG' http://localhost/cadc-target-resolver/logControl && gradle -i -Dca.nrc.cadc.reg.client.RegistryClient.host=localhost clean intTest

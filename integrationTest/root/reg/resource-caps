@@ -1,1 +1,1 @@
-ivo://cadc.nrc.ca/resolver  = http://localhost/capabilities-http.xml
+ivo://cadc.nrc.ca/resolver  = http://proxy.cadc.dao.nrc.ca/capabilities-http.xml
