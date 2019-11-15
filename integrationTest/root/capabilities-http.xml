@@ -6,19 +6,19 @@
 
     <capability standardID="ivo://ivoa.net/std/VOSI#capabilities">
         <interface xsi:type="vs:ParamHTTP" role="std">
-            <accessURL use="full">http://proxy.cadc.dao.nrc.ca/cadc-target-resolver/capabilities</accessURL>
+            <accessURL use="full">http://localhost/cadc-target-resolver/capabilities</accessURL>
         </interface>
     </capability>
 
     <capability standardID="vos://cadc.nrc.ca~vospace/CADC/std/Logging#control-1.0">
         <interface xsi:type="vs:ParamHTTP" role="std" version="1.0">
-            <accessURL use="full">http://proxy.cadc.dao.nrc.ca/cadc-target-resolver/logControl</accessURL>
+            <accessURL use="full">http://localhost/cadc-target-resolver/logControl</accessURL>
         </interface>
     </capability>
 
     <capability standardID="vos://cadc.nrc.ca~vospace/CADC/std/NameResolver#names-1.0">
         <interface xsi:type="vs:ParamHTTP" role="std" version="1.0">
-            <accessURL use="base">http://proxy.cadc.dao.nrc.ca/cadc-target-resolver/find</accessURL>
+            <accessURL use="base">http://localhost/cadc-target-resolver/find</accessURL>
         </interface>
     </capability>
 
