@@ -17,7 +17,7 @@ services:
     networks:
       - 'resolver'
     environment:
-      CATALINA_OPTS: "-Dca.nrc.cadc.reg.client.RegistryClient.host=${REGISTRY_HOST}"
+      CATALINA_OPTS: "-Dca.nrc.cadc.reg.client.RegistryClient.host=proxy.cadc.dao.nrc.ca"
 
 # Create the network 'resolver' for which this system will run within.
 networks:
