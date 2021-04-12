@@ -91,7 +91,7 @@ public enum Service {
 
     // Queries the Sesame(only for vizier) service at CDS.
     VIZIER("vizier", "cdsweb.u-strasbg.fr", 80,
-            HttpMethod.GET, "/cgi-bin/nph-sesame/-o/V?",
+            HttpMethod.GET, "/cgi-bin/nph-sesame/-o/~V?",
             null, "HTTP/1.1\r\nHost: cdsweb.u-strasbg.fr\r\n\r\n", true);
 
 
