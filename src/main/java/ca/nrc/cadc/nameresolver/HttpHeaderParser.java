@@ -82,10 +82,10 @@ import java.util.regex.Pattern;
 class HttpHeaderParser {
     private static final String LOCATION_HEADER_KEY = "Location";
     private static final Pattern NEWLINE = Pattern.compile("\n");
-    private static final Pattern HEADER_LINE = Pattern.compile("HTTP/(1.[0-9]) ([0-9]{3})(?: [0-9]{3})? ([A-Za-z ]*)");
+    private static final Pattern HEADER_LINE = Pattern.compile("HTTP/(1\\.[\\d]) ([\\d]{3}) ([\\d]*[A-Za-z]*)");
 
     private String data;
-    private Map<String, String> headers;
+    private final Map<String, String> headers = new HashMap<>();
     private int responseCode;
 
     /**
@@ -99,7 +99,6 @@ class HttpHeaderParser {
         }
         //log.debug("header:\n" + data);
         this.data = data;
-        this.headers = new HashMap<>();
         this.responseCode = 0;
         parse();
     }
