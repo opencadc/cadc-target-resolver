@@ -1,6 +1,7 @@
 name: Java/Docker CI
 
-on: [push]
+on:
+  push:
 
 jobs:
   build-and-test:
