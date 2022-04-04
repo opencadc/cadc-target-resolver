@@ -69,10 +69,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <%
-  final String schemeServerName = "http://" + new URL(request.getRequestURL().toString()).getHost();
+  final String scheme = request.getScheme();
+  final String schemeServerName = scheme + "://" + new URL(request.getRequestURL().toString()).getHost();
   final int requestServerPort = request.getServerPort();
-  final int port = ((request.getScheme().equals("http") && (requestServerPort == 80))
-                    || (request.getScheme().equals("https") && (requestServerPort == 443)))
+  final int port = ((scheme.equals("http") && (requestServerPort == 80))
+                    || (scheme.equals("https") && (requestServerPort == 443)))
                    ? -1 : requestServerPort;
   final String displayLinkURL = schemeServerName + ((port > 0) ? ":" + port : "") + request.getContextPath() + "/find";
 %>
