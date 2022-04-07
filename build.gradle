@@ -16,6 +16,8 @@ sourceSets {
 
 configurations {
     intTestImplementation.extendsFrom(testImplementation)
+
+    runtime.exclude group: 'org.springframework', module: 'spring-jdbc'
 }
 
 idea {
@@ -32,8 +34,8 @@ dependencies {
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
 
     implementation 'org.opencadc:cadc-dali:[1.2.13,)'
-    implementation 'org.opencadc:cadc-util:[1.5.12,)'
     implementation 'org.opencadc:cadc-log:[1.1.4,)'
+    implementation 'org.opencadc:cadc-util:[1.5.12,)'
     implementation 'org.opencadc:cadc-vosi:[1.3.12,)'
     implementation 'org.opencadc:caom2-search-lib:[2.5.6,3.0)'
 
