@@ -3,7 +3,7 @@
  *******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
  **************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
  *
- *  (c) 2017.                            (c) 2017.
+ *  (c) 2022.                            (c) 2022.
  *  Government of Canada                 Gouvernement du Canada
  *  National Research Council            Conseil national de recherches
  *  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -74,7 +74,7 @@ import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.vosi.AvailabilityPlugin;
-import ca.nrc.cadc.vosi.AvailabilityStatus;
+import ca.nrc.cadc.vosi.Availability;
 import ca.nrc.cadc.vosi.avail.CheckException;
 import ca.nrc.cadc.vosi.avail.CheckURL;
 
@@ -105,7 +105,7 @@ public class TargetResolverWebService implements AvailabilityPlugin {
     }
 
     @Override
-    public AvailabilityStatus getStatus() {
+    public Availability getStatus() {
         boolean isAvailable = false;
         StringBuilder note = new StringBuilder();
         final RegistryClient registryClient = new RegistryClient();
@@ -136,7 +136,7 @@ public class TargetResolverWebService implements AvailabilityPlugin {
             note.append("Unrecoverable error: ").append(t);
         }
 
-        return new AvailabilityStatus(isAvailable, null, null, null, note.toString());
+        return new Availability(isAvailable, note.toString());
     }
 
     /**

@@ -122,7 +122,7 @@ public class NedVOTableParser extends DefaultParser implements Parser {
         final VOTableDocument votable;
         try {
             votable = reader.read(results.substring(index));
-        } catch (IOException e) {
+        } catch (IOException | UnsupportedOperationException e) {
             final String message = "error reading NED VOTABLE because " + e.getMessage();
             throw new TargetDataParsingException(message);
         }
