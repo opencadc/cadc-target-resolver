@@ -122,15 +122,9 @@ public class NRServletTest {
     private static final String OTYPE = "otype";
     private static final String MTYPE = "mtype";
     private static final String ICRS = "ICRS";
-    private final RegistryClient registryClient;
+    private final RegistryClient registryClient = new RegistryClient();
 
-    public NRServletTest() throws Exception {
-        final String resourceCapsURL = System.getenv("RESOURCE_CAPS_URL");
-        if (StringUtil.hasText(resourceCapsURL)) {
-            registryClient = new RegistryClient(new URL(resourceCapsURL));
-        } else {
-            registryClient = new RegistryClient();
-        }
+    public NRServletTest() {
     }
 
     @BeforeClass

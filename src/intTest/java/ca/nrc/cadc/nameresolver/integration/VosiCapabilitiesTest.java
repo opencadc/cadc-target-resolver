@@ -102,17 +102,14 @@ public class VosiCapabilitiesTest extends CapabilitiesTest {
     private static final Logger log = Logger.getLogger(VosiCapabilitiesTest.class);
     private static final URI RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/resolver");
 
+    RegistryClient regClient = new RegistryClient();
+    
     public VosiCapabilitiesTest() {
         super(RESOURCE_ID);
     }
 
     RegistryClient getRegistryClient() throws Exception {
-        final String resourceCapsURL = System.getenv("RESOURCE_CAPS_URL");
-        if (StringUtil.hasText(resourceCapsURL)) {
-            return new RegistryClient(new URL(resourceCapsURL));
-        } else {
-            return new RegistryClient();
-        }
+        return regClient;
     }
 
     Capabilities getCapabilities() throws Exception {
