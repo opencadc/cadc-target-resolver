@@ -21,5 +21,3 @@ jobs:
         run: docker-compose -f integrationTest/docker-compose.yml up -d && docker ps -a && docker-compose -f integrationTest/docker-compose.yml logs resolver && docker-compose -f integrationTest/docker-compose.yml logs proxy
       - name: Execute Integration Tests
         run: curl -vL -d 'level=DEBUG' http://localhost/cadc-target-resolver/logControl && curl -Lv http://localhost/capabilities-http.xml && gradle -i -Dca.nrc.cadc.reg.client.RegistryClient.host=localhost clean intTest
-        env:
-          RESOURCE_CAPS_URL: http://localhost/reg/resource-caps
