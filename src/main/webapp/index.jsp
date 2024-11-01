@@ -224,8 +224,14 @@
       &nbsp;&nbsp;Results:
       <br/>
       <pre>
-        <c:import var="ascii_output" url="${displayLinkURL}?target=m31" />
-        <code id="ascii_output"><c:out value="${ascii_output}" /></code>
+      <code>
+target=m31
+service=ned(ned.ipac.caltech.edu)
+coordsys=ICRS
+ra=10.684799
+dec=41.269076
+time(ms)=2844
+      </code>
       </pre>
     </dd>
     <dt>Query for target m31 using optional parameters: service = SIMBAD, cached = do not return cached coordinates,
@@ -238,8 +244,9 @@
       <br/><br/>
       &nbsp;&nbsp;Results:
       <pre>
-      <c:import var="json_output" url="${displayLinkURL}?target=m31&service=simbad&cached=no&detail=max&format=json" />
-      <code id="json_output"><c:out value="${json_output}" /> </code>
+      <code>
+      {"target":"m31","service":"Simbad(simbad.u-strasbg.fr)","coordsys":"ICRS","ra":10.684708,"dec":41.26875,"oname":"M 31","otype":"AGN","mtype":"SA(s)b","time":1751}
+      </code>
     </pre>
     </dd>
   </dl>
