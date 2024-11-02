@@ -20,6 +20,15 @@ configurations {
     runtime.exclude group: 'org.springframework', module: 'spring-jdbc'
 }
 
+war {
+    from(System.getenv('RPS') + '/resources/') {
+        include 'swagger-ui/'
+    }
+    from('.') {
+        include 'VERSION'
+    }
+}
+
 idea {
     module {
         // Add some extra test source dirs
