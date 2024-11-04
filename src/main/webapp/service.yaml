@@ -60,7 +60,7 @@ paths:
           description: 'Services to query. Examples: service=NED'
           required: false
           default: ALL
-          values:
+          enum:
             - NED
             - SIMBAD
             - VIZIER
@@ -73,7 +73,7 @@ paths:
           required: false
           type: string
           default: ASCII
-          values:
+          enum:
             - ASCII
             - JSON
         - name: cached
@@ -82,7 +82,7 @@ paths:
           required: false
           type: boolean
           default: YES
-          values:
+          enum:
             - YES
             - NO
         - name: detail
@@ -91,7 +91,7 @@ paths:
           required: false
           type: string
           default: MIN
-          values:
+          enum:
             - MIN: 'min - default fields:
                       target: the target name to resolve.
                       service: the service that resolved the object.

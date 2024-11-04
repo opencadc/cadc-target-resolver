@@ -20,7 +20,7 @@ jobs:
         java-version: 1.11
 
     - name: build and test cadc-name-resolver
-      run: ./gradlew --info clean build xslt
+      run: ./gradlew --info clean build
       
     - name: Build the Docker image
         run: docker build -t opencadc/cadc-target-resolver:SNAPSHOT .
