@@ -8,7 +8,7 @@ repositories {
     mavenLocal()
 }
 
-sourceCompatibility = 1.8
+sourceCompatibility = 11
 
 sourceSets {
     intTest
@@ -18,6 +18,15 @@ configurations {
     intTestImplementation.extendsFrom(testImplementation)
 
     runtime.exclude group: 'org.springframework', module: 'spring-jdbc'
+}
+
+war {
+    from(System.getenv('RPS') + '/resources/') {
+        include 'swagger-ui/'
+    }
+    from('.') {
+        include 'VERSION'
+    }
 }
 
 idea {
