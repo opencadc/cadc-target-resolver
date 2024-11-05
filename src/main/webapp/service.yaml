@@ -44,7 +44,8 @@ paths:
       summary: Return RA and DEC for an object name
       responses:
         '404':
-          description: If the artifact could not be found.
+          description: |
+            If the artifact could not be found.
         '500':
           description: Internal error
         '503':
@@ -52,12 +53,14 @@ paths:
       parameters:
         - name: target
           in: query
-          description: 'Name of the object to resolve. Examples: target=M31'
+          description: |
+            Name of the object to resolve. Examples: target=M31
           required: true
           type: string
         - name: service
           in: query
-          description: 'Services to query. Examples: service=NED'
+          description: |
+            Services to query. Examples: service=NED
           required: false
           default: ALL
           enum:
@@ -69,7 +72,8 @@ paths:
           collectionFormat: multi
         - name: format
           in: query
-          description: 'Response FORMAT. Examples: format=JSON'
+          description: |
+            Response FORMAT. Examples: format=JSON
           required: false
           type: string
           default: ASCII
@@ -78,7 +82,8 @@ paths:
             - JSON
         - name: cached
           in: query
-          description: 'Whether to return previous cached results. Examples: cached=YES'
+          description: |
+            Whether to return previous cached results. Examples: cached=YES
           required: false
           type: boolean
           default: YES
@@ -87,22 +92,25 @@ paths:
             - NO
         - name: detail
           in: query
-          description: 'Details to return. Examples: detail=MAX'
+          description: |
+            Details to return. Examples: detail=MAX
+                * MIN - default fields:
+                    * target: the target name to resolve.
+                    * service: the service that resolved the object.
+                    * coordsys: the coordinates system, always ICRS.
+                    * ra: the right ascension of the object in degrees.
+                    * dec: the declination of the object in degrees.
+                    * time: time in milliseconds to resolve the object.
+                * MAX - default with following additional fields:
+                    * oname: the service preferred object name.
+                    * otype: the object type code.
+                    * mtype: the object morphology type.
           required: false
           type: string
           default: MIN
           enum:
-            - MIN: 'min - default fields:
-                      target: the target name to resolve.
-                      service: the service that resolved the object.
-                      coordsys: the coordinates system, always ICRS.
-                      ra: the right ascension of the object in degrees.
-                      dec: the declination of the object in degrees.
-                      time: time in milliseconds to resolve the object.'
-            - MAX: 'max - default with following additional fields:
-                      oname: the service preferred object name.
-                      otype: the object type code.
-                      mtype: the object morphology type.'
+            - MIN
+            - MAX
   /availability:
     get:
       tags:
