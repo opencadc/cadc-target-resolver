@@ -38,7 +38,7 @@ will start the server.  You can point your browser to http://localhost:8080/cadc
 # checking the health of the service
 
 ```
-curl http://localhost/cadc-target-resolver/availability
+curl http://localhost:8080/cadc-target-resolver/availability
 ```
 result
 ```
@@ -53,7 +53,7 @@ result
 # usage example
 
 ```
-curl http://localhost/cadc-target-resolver/find\?target=m31
+curl http://localhost:8080/cadc-target-resolver/find\?target=m31
 ```
 result
 
