@@ -246,5 +246,29 @@ public class NEDParserTest extends AbstractParserTest
             fail("unexpected exception: " + unexpected);
         }
     }
+
+    @Test
+    public void testNEDIncompatibleVersion()
+    {
+        try
+        {
+            String results = getTestFile("NED_JSON_WRONG_VERSION.json", false);
+
+            Parser parser = new NEDParser(getTarget(), getHost(), results);
+            assertNotNull(parser);
+
+            try {
+                TargetData data = parser.parse();
+                fail("Incompatible NED version should throw TargetDataParsingException");
+            }
+            catch (TargetDataParsingException e)
+            { }
+        }
+        catch(Exception unexpected)
+        {
+            log.error("unexpected exception", unexpected);
+            fail("unexpected exception: " + unexpected);
+        }
+    }
     
 }

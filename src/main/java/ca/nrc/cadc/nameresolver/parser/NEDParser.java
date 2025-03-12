@@ -85,7 +85,7 @@ import org.json.JSONObject;
 public class NEDParser extends DefaultParser implements Parser {
     private final static Logger log = Logger.getLogger(NEDParser.class);
 
-    private final static double SUPPORTED_NED_VERSION = 2.0;
+    private final static double SUPPORTED_NED_MAJOR_VERSION = 2.0;
 
     private static Map<Integer, String> resultCodes =
             new TreeMap<Integer, String>();
@@ -168,12 +168,13 @@ public class NEDParser extends DefaultParser implements Parser {
         return targetData;
     }
 
-    private void checkVersion(final Double version) {
-        if (version != SUPPORTED_NED_VERSION) {
-            final String error = String.format("The current supported version "
-                    + "%s does not match the returned version: %s",
-                    SUPPORTED_NED_VERSION, version);
+    private void checkVersion(final Double version) throws TargetDataParsingException {
+
+        if ((version < SUPPORTED_NED_MAJOR_VERSION) || (version >= (SUPPORTED_NED_MAJOR_VERSION + 1))) {
+            // Note: check for changes at https://ned.ipac.caltech.edu/Documents/Guides/Searches
+            final String error = String.format("Unsupported NED version: %s", version);
             log.error(error);
+            throw new TargetDataParsingException(error);
         }
     }
 
