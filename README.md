@@ -65,3 +65,11 @@ ra=10.684799
 dec=41.269076
 time(ms)=2508
 ```
+
+Note: The `capabilities` endpoint requires the `catalina.properties` file to be present in the `/config` directory
+(see above for details) and it will not work with the very basic example above. The correct docker `run` command for 
+that to work is:
+
+```
+docker run --rm -it -p 8080:8080 -p 5555:5555 --volume=/path/to/external/config:/config:ro cadc-target-resolver:latest
+```
