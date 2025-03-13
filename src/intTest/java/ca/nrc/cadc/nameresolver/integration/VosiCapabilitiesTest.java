@@ -100,7 +100,7 @@ import org.junit.Test;
  */
 public class VosiCapabilitiesTest extends CapabilitiesTest {
     private static final Logger log = Logger.getLogger(VosiCapabilitiesTest.class);
-    private static final URI RESOURCE_ID = URI.create("ivo://cadc.nrc.ca/resolver");
+    private static final URI RESOURCE_ID = URI.create("ivo://opencadc.org/resolver");
 
     RegistryClient regClient = new RegistryClient();
     
@@ -117,7 +117,6 @@ public class VosiCapabilitiesTest extends CapabilitiesTest {
     }
 
     @Test
-    @Override
     public void testValidateCapabilitiesUsingGetCapabilities() {
         try {
             // get the capabilities associated with the resourceIdentifier
@@ -144,7 +143,6 @@ public class VosiCapabilitiesTest extends CapabilitiesTest {
         }
     }
 
-    @Override
     @Test
     public void testValidateCapabilitiesUsingGetServiceURL() {
         try {

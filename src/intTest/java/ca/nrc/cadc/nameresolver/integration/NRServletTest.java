@@ -133,7 +133,7 @@ public class NRServletTest {
     }
 
     private HttpURLConnection openConnection(String query) throws Exception {
-        URL url = registryClient.getServiceURL(URI.create("ivo://cadc.nrc.ca/resolver"), Standards.RESOLVER_10,
+        URL url = registryClient.getServiceURL(URI.create("ivo://opencadc.org/resolver"), Standards.RESOLVER_10,
                                                AuthMethod.ANON);
         if (query != null) {
             url = new URL(url.toExternalForm() + "?" + query);
@@ -240,7 +240,7 @@ public class NRServletTest {
         final double ra = 10.68479d;
         final double dec = 41.26906d;
         final String oname = "M 31";
-        final String otype = "G";
+        final String otype = "AGN";
         final String mtype = "SA(s)b";
 
         validateASCII("target=m31&service=simbad", target, ra, dec, null, null, null, false);
@@ -271,7 +271,7 @@ public class NRServletTest {
         final double ra = 10.68479d;
         final double dec = 41.26906d;
         final String oname = "M 31";
-        final String otype = "G";
+        final String otype = "AGN";
         final String mtype = "SA(s)b";
 
         validateASCII("target=" + NetUtil
@@ -336,7 +336,7 @@ public class NRServletTest {
         final double ra = 10.684708d;
         final double dec = 41.26875d;
         final String oname = "M 31";
-        final String otype = "G";
+        final String otype = "AGN";
         final String mtype = "SA(s)b";
 
         validateJSON("target=m31&format=json&service=simbad", target, ra, dec, null, null, null, false);
@@ -397,7 +397,7 @@ public class NRServletTest {
         final double ra = 10.684708d;
         final double dec = 41.26875d;
         final String oname = "M 31";
-        final String otype = "G";
+        final String otype = "AGN";
         final String mtype = "SA(s)b";
 
         validateXML("target=m31&format=xml&service=simbad", target, ra, dec, null, null, null, false);

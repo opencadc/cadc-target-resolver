@@ -66,10 +66,14 @@
  ************************************************************************
  */
 
-package ca.nrc.cadc.nameresolver.ws;
+package ca.nrc.cadc.nameresolver;
 
 import ca.nrc.cadc.auth.AuthMethod;
+import ca.nrc.cadc.nameresolver.NRServlet;
 import ca.nrc.cadc.nameresolver.Service;
+import ca.nrc.cadc.nameresolver.TargetData;
+import ca.nrc.cadc.nameresolver.TargetDataWriter;
+import ca.nrc.cadc.nameresolver.TargetResolverRequest;
 import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
@@ -78,13 +82,16 @@ import ca.nrc.cadc.vosi.Availability;
 import ca.nrc.cadc.vosi.avail.CheckException;
 import ca.nrc.cadc.vosi.avail.CheckURL;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
+import org.apache.log4j.Logger;
 
 public class TargetResolverWebService implements AvailabilityPlugin {
+    private static final Logger log = Logger.getLogger(TargetResolverWebService.class);
     private final Map<Service, String> testNameValues = new HashMap<>();
 
     public TargetResolverWebService() {
@@ -108,29 +115,33 @@ public class TargetResolverWebService implements AvailabilityPlugin {
     public Availability getStatus() {
         boolean isAvailable = false;
         StringBuilder note = new StringBuilder();
-        final RegistryClient registryClient = new RegistryClient();
-
         try {
-            final URL baseURL = registryClient.getServiceURL(URI.create("ivo://cadc.nrc.ca/resolver"),
-                                                             Standards.RESOLVER_10, AuthMethod.ANON);
+            NRServlet serv = new NRServlet();
+            serv.init(null);
 
             for (final Service service : Service.values()) {
-                final URL checkServiceURL = new URL(baseURL, "find?target=" + testNameValues.get(service)
-                    + "&format=json&service=" + service.getCommonName());
-                final CheckURL checkURL = new CheckURL(service.name(), checkServiceURL, 200,
-                                                       "application/json");
                 note.append("*** Service ").append(service.name());
 
+                final Map<String, String[]> requestMap = new HashMap<>();
+                requestMap.put("target", new String[]{testNameValues.get(service)});
+                requestMap.put("service", new String[]{service.getCommonName()});
+                requestMap.put("format", new String[]{"json"});
+                TargetResolverRequest targetResolverRequest = null;
                 try {
-                    checkURL.check();
-                    note.append(" is available.");
-                } catch (CheckException e) {
+                    targetResolverRequest = new TargetResolverRequest(requestMap);
+                    TargetData targetData = serv.exhaustiveLookup(targetResolverRequest);
+                    if (targetData != null) {
+                        note.append(" is available.");
+                    } else {
+                        note.append(" is not available.");
+                    }
+                } catch (Exception e) {
                     note.append(" is not available: ").append(e.getMessage());
+                    log.error("Error checking service " + service.name(), e);
                 } finally {
                     note.append(" ***   ");
                 }
             }
-
             isAvailable = true;
         } catch (Throwable t) {
             note.append("Unrecoverable error: ").append(t);
