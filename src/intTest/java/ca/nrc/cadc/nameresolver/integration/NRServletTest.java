@@ -137,7 +137,7 @@ public class NRServletTest {
                                                AuthMethod.ANON);
         if (query != null) {
             url = new URL(url.toExternalForm() + "?" + query);
-            log.debug("query url: " + url);
+            log.debug("query url: " + url.toExternalForm());
         }
         return (HttpURLConnection) url.openConnection();
     }
