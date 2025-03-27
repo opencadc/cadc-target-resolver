@@ -72,7 +72,8 @@ import ca.nrc.cadc.nameresolver.Parser;
 import ca.nrc.cadc.nameresolver.Service;
 import ca.nrc.cadc.nameresolver.TargetData;
 import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,12 +84,13 @@ import org.json.JSONObject;
  * @author jburke
  */
 public class NEDParser extends DefaultParser implements Parser {
-    private final static Logger log = Logger.getLogger(NEDParser.class);
+    private static final Logger log = Logger.getLogger(NEDParser.class);
 
-    private final static double SUPPORTED_NED_MAJOR_VERSION = 2.0;
+    private static final double SUPPORTED_NED_MAJOR_VERSION = 2.0;
 
     private static Map<Integer, String> resultCodes =
             new TreeMap<Integer, String>();
+
     static {
         resultCodes.put(0, "Not an object name: the supplied string could not "
                 + "be interpreted as the as a valid object name.");

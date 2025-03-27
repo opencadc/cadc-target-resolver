@@ -68,13 +68,11 @@
 
 package ca.nrc.cadc.nameresolver.parser;
 
+import ca.nrc.cadc.astro.CoordUtil;
 import ca.nrc.cadc.nameresolver.Parser;
 import ca.nrc.cadc.nameresolver.TargetData;
 import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
-
 import org.apache.log4j.Logger;
-
-import ca.nrc.cadc.util.CoordUtil;
 
 /**
  * Parses the results of a Simbad target query for the RA and DEC values.
@@ -89,8 +87,8 @@ public class SimbadParser extends DefaultParser implements Parser {
     private static final String SIMBAD_ERROR_BIBCODE = "For querying by bibcode";
     private static final String SIMBAD_ERROR_COORD_QUERY = "For querying by coordinates";
     private static final String SIMBAD_ERROR_CATALOG_NOT_FOUND = "No known catalog could be found";
-    private static final String SIMBAD_ERROR_CATALOG_INCORRECT_FORMAT = "this identifier has an incorrect format for " +
-        "catalog";
+    private static final String SIMBAD_ERROR_CATALOG_INCORRECT_FORMAT = "this identifier has an incorrect format for "
+        + "catalog";
 
 
     private static final String SIMBAD_COORDINATES = "Coordinates";
@@ -114,11 +112,8 @@ public class SimbadParser extends DefaultParser implements Parser {
     /**
      * Parses the resolver results for the RA & Dec, object name and type,
      * and morphology values. Returns null if no results found.
-     * <p>
      * Typical result line below:
-     * <p>
      * Object M 31  ---  G  ---  OID=@1575544   (@@143594,0)  ---  coobox=11643
-     * <p>
      * Coordinates(ICRS,ep=J2000,eq=2000): 010.684708 +41.268750 (IR  ) B [~ ~ ~] 2006AJ....131.1163S
      * Morphological type: SA(s)b  D 2013AJ....146...67B
      */
@@ -142,11 +137,11 @@ public class SimbadParser extends DefaultParser implements Parser {
             // Try and detect some common query errors when SIMBAD thinks the
             // target is a coordinate, catalog, or bibcode.
             if (line.startsWith(SIMBAD_ERROR_COMMENT)) {
-                if (line.contains(SIMBAD_ERROR_TARGET_NOT_FOUND) ||
-                    line.contains(SIMBAD_ERROR_BIBCODE) ||
-                    line.contains(SIMBAD_ERROR_COORD_QUERY) ||
-                    line.contains(SIMBAD_ERROR_CATALOG_NOT_FOUND) ||
-                    line.contains(SIMBAD_ERROR_CATALOG_INCORRECT_FORMAT)) {
+                if (line.contains(SIMBAD_ERROR_TARGET_NOT_FOUND)
+                    || line.contains(SIMBAD_ERROR_BIBCODE)
+                    || line.contains(SIMBAD_ERROR_COORD_QUERY)
+                    || line.contains(SIMBAD_ERROR_CATALOG_NOT_FOUND)
+                    || line.contains(SIMBAD_ERROR_CATALOG_INCORRECT_FORMAT)) {
                     log.debug("returning null because " + line);
                     return null;
                 } else {

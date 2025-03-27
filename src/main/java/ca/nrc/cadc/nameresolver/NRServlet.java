@@ -68,7 +68,12 @@
 
 package ca.nrc.cadc.nameresolver;
 
+import ca.nrc.cadc.log.ServletLogInfo;
+import ca.nrc.cadc.log.WebServiceLogInfo;
+import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
 import ca.nrc.cadc.nameresolver.parser.NEDParser;
+import ca.nrc.cadc.nameresolver.parser.SesameParser;
+import ca.nrc.cadc.nameresolver.parser.SimbadParser;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -81,23 +86,20 @@ import java.nio.channels.UnresolvedAddressException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
-
-import ca.nrc.cadc.nameresolver.parser.SimbadParser;
-import ca.nrc.cadc.nameresolver.parser.SesameParser;
-import ca.nrc.cadc.log.ServletLogInfo;
-import ca.nrc.cadc.log.WebServiceLogInfo;
-import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
 
 
 /**
@@ -299,7 +301,7 @@ public class NRServlet extends HttpServlet {
         return sb.toString();
     }
 
-    /***
+    /**
      * Get the TargetData object from the target class.
      *
      * @param cacheKey String key for target cache.
@@ -320,7 +322,7 @@ public class NRServlet extends HttpServlet {
         return targetData;
     }
 
-    /***
+    /**
      * Add the TargetData object to the target cache.
      *
      * @param cacheKey String key for target cache.
@@ -337,7 +339,6 @@ public class NRServlet extends HttpServlet {
      * Construct and start the service queries to resolve the target.
      * Returns the results from the first database that has successfully resolved the target,
      * or null if the target was not resolved.
-     * <p>
      * Allow tests to override.
      *
      * @param selector the selector
@@ -378,10 +379,7 @@ public class NRServlet extends HttpServlet {
                     // connectable channel, send the query request, then register interest in reading the channel
                     if (key.isConnectable()) {
                         connectChannel(selector, channel, key, encoder, target);
-                    }
-
-                    // readable channel, check the response code and parse the results
-                    else if (key.isReadable()) {
+                    } else if (key.isReadable()) { // readable channel, check the response code and parse the results
                         // remember which channel we are processing
                         final String host = channel.socket().getInetAddress().getHostName();
 
@@ -424,11 +422,9 @@ public class NRServlet extends HttpServlet {
                                         break;
                                     }
                                 }
-                            }
-
-                            // 302 or 303, redirected
-                            else if (responseCode == HttpServletResponse.SC_MOVED_TEMPORARILY
+                            } else if (responseCode == HttpServletResponse.SC_MOVED_TEMPORARILY
                                     || responseCode == HttpServletResponse.SC_MOVED_PERMANENTLY) {
+                                // 302 or 303, redirected
                                 // get the redirect location
                                 String location = headerParser.getLocation();
                                 LOGGER.debug("  redirected[" + responseCode + "] to "
@@ -479,8 +475,8 @@ public class NRServlet extends HttpServlet {
         }
 
         if (targetData == null) {
-            if (serviceData.containsKey(Service.NED) && serviceData.get(Service.NED) == null &&
-                    serviceData.containsKey(Service.SIMBAD) && serviceData.get(Service.SIMBAD) == null) {
+            if (serviceData.containsKey(Service.NED) && serviceData.get(Service.NED) == null
+                    && serviceData.containsKey(Service.SIMBAD) && serviceData.get(Service.SIMBAD) == null) {
                 targetData = serviceData.get(Service.VIZIER);
             }
 
@@ -509,7 +505,6 @@ public class NRServlet extends HttpServlet {
 
     /**
      * Create a socket channel with the given host and register connect interest with the selector.
-     * <p>
      * Override for tests to not actually make a request out.
      *
      * @param selector the selector
@@ -533,7 +528,6 @@ public class NRServlet extends HttpServlet {
 
     /**
      * Create a socket channel with the given host and register connect interest with the selector.
-     * <p>
      * Override for tests to not actually make a request out.
      *
      * @param selector the selector
@@ -658,7 +652,7 @@ public class NRServlet extends HttpServlet {
         int bytesRead = 0;
         try {
             bytesRead = channel.read(buffer);
-            while(bytesRead > 0) {
+            while (bytesRead > 0) {
                 buffer.flip();
                 decoder.decode(buffer, charBuffer, false);
                 charBuffer.flip();
@@ -696,8 +690,8 @@ public class NRServlet extends HttpServlet {
      * @param statusCode the status code returned from the host.
      */
     private static void logHostError(final String host, final int statusCode) {
-        LOGGER.error(Calendar.getInstance().getTime().toString() +
-                         " *** cadc-target-resolver *** " + "Error connecting to host " + host + ", http status code "
+        LOGGER.error(Calendar.getInstance().getTime().toString()
+                         + " *** cadc-target-resolver *** " + "Error connecting to host " + host + ", http status code "
                          + statusCode);
     }
 

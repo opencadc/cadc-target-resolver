@@ -68,14 +68,13 @@
 
 package ca.nrc.cadc.nameresolver;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
-
-import java.io.StringWriter;
-import java.io.Writer;
+import static org.junit.Assert.assertFalse;
 
 
 public class TargetDataXMLWriterTest extends AbstractTargetDataWriterTest<TargetDataXMLWriter>

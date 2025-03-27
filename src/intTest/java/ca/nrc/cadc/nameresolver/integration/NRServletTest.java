@@ -73,7 +73,17 @@ import ca.nrc.cadc.net.NetUtil;
 import ca.nrc.cadc.reg.Standards;
 import ca.nrc.cadc.reg.client.RegistryClient;
 import ca.nrc.cadc.util.Log4jInit;
-import ca.nrc.cadc.util.StringUtil;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -83,16 +93,6 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -137,7 +137,7 @@ public class NRServletTest {
                                                AuthMethod.ANON);
         if (query != null) {
             url = new URL(url.toExternalForm() + "?" + query);
-            log.debug("query url: " + url.toExternalForm());
+            log.debug("query url: " + url);
         }
         return (HttpURLConnection) url.openConnection();
     }

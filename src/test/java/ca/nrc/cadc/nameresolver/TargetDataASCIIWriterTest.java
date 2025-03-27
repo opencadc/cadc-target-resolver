@@ -68,11 +68,10 @@
 
 package ca.nrc.cadc.nameresolver;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.StringWriter;
 import java.io.Writer;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TargetDataASCIIWriterTest extends AbstractTargetDataWriterTest<TargetDataASCIIWriter>
 {

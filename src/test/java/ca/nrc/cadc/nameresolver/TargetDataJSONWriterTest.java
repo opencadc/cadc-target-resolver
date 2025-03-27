@@ -70,7 +70,6 @@ package ca.nrc.cadc.nameresolver;
 
 import java.io.StringWriter;
 import java.io.Writer;
-
 import org.json.JSONObject;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
