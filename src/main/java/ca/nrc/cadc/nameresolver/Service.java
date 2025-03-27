@@ -68,7 +68,6 @@
 
 package ca.nrc.cadc.nameresolver;
 
-
 import ca.nrc.cadc.net.NetUtil;
 
 public enum Service {
@@ -136,7 +135,9 @@ public enum Service {
         return port;
     }
 
-    public HttpMethod getMethod() { return method; }
+    public HttpMethod getMethod() {
+        return method;
+    }
 
     public String getConnectString(final String target) {
         if (this.method.equals(HttpMethod.GET)) {

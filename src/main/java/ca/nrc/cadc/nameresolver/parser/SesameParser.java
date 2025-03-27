@@ -71,12 +71,9 @@ package ca.nrc.cadc.nameresolver.parser;
 import ca.nrc.cadc.nameresolver.Parser;
 import ca.nrc.cadc.nameresolver.TargetData;
 import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
-
-import java.util.StringTokenizer;
-
-import org.apache.log4j.Logger;
-
 import ca.nrc.cadc.util.CoordUtil;
+import java.util.StringTokenizer;
+import org.apache.log4j.Logger;
 
 /**
  * Parses the results of a Sesame target query for the RA and DEC values.
@@ -106,7 +103,7 @@ public class SesameParser extends DefaultParser implements Parser {
      * and will be null. Returns null if no results found.
      *
      * @return TargetData object if successful in parsing out the RA and Dec
-     * values, or null if the resolver was unable to resolve the target.
+     *     values, or null if the resolver was unable to resolve the target.
      * @throws TargetDataParsingException if unable to parse the results
      *                                    returned from the resolver.
      */

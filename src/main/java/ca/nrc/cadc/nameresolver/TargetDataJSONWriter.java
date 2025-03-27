@@ -68,10 +68,8 @@
 
 package ca.nrc.cadc.nameresolver;
 
-
-import org.json.JSONWriter;
-
 import java.io.Writer;
+import org.json.JSONWriter;
 
 
 public class TargetDataJSONWriter implements TargetDataWriter {

@@ -1,6 +1,7 @@
 plugins {
     id 'idea'
     id 'war'
+    id 'checkstyle'
 }
 
 repositories {
@@ -15,9 +16,38 @@ sourceSets {
 }
 
 configurations {
-    intTestImplementation.extendsFrom(testImplementation)
+    checkstyleDep
+    intTestImplementation.extendsFrom testImplementation
 
-    runtime.exclude group: 'org.springframework', module: 'spring-jdbc'
+    runtime.exclude module: 'slf4j-reload4j'
+    runtime.exclude module: 'reload4j'
+    runtime.exclude group: 'spring-jdbc'
+}
+
+dependencies {
+    testImplementation 'com.puppycrawl.tools:checkstyle:8.2'
+    checkstyleDep 'org.opencadc:cadc-quality:[1.0,)'
+}
+
+
+checkstyle {
+    ignoreFailures = false
+    config = resources.text.fromArchiveEntry(configurations.checkstyleDep, 'cadc_checkstyle.xml')
+    toolVersion = '8.2'
+    sourceSets = []
+}
+
+// Temporary work around for issue https://github.com/gradle/gradle/issues/881 -
+// gradle not displaying fail build status when warnings reported -->
+tasks.withType(Checkstyle).each { checkstyleTask ->
+    checkstyleTask.doLast {
+        reports.all { report ->
+            def outputFile = report.destination
+            if (outputFile.exists() && outputFile.text.contains("<error ")) {
+                throw new GradleException("There were checkstyle warnings! For more info check $outputFile")
+            }
+        }
+    }
 }
 
 war {
@@ -41,7 +71,7 @@ dependencies {
     implementation 'org.jdom:jdom2:[2.0.6.1,3.0)'
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
 
-    implementation 'org.opencadc:cadc-dali:[1.2.13,)'
+    implementation 'org.opencadc:cadc-dali:[1.2.23,)'
     implementation 'org.opencadc:cadc-log:[1.1.4,)'
     implementation 'org.opencadc:cadc-util:[1.6.1,2.0)'
     implementation 'org.opencadc:cadc-vosi:[1.3.12,)'

@@ -68,24 +68,9 @@
 
 package ca.nrc.cadc.nameresolver;
 
-import ca.nrc.cadc.auth.AuthMethod;
-import ca.nrc.cadc.nameresolver.NRServlet;
-import ca.nrc.cadc.nameresolver.Service;
-import ca.nrc.cadc.nameresolver.TargetData;
-import ca.nrc.cadc.nameresolver.TargetDataWriter;
-import ca.nrc.cadc.nameresolver.TargetResolverRequest;
 import ca.nrc.cadc.net.NetUtil;
-import ca.nrc.cadc.reg.Standards;
-import ca.nrc.cadc.reg.client.RegistryClient;
-import ca.nrc.cadc.vosi.AvailabilityPlugin;
 import ca.nrc.cadc.vosi.Availability;
-import ca.nrc.cadc.vosi.avail.CheckException;
-import ca.nrc.cadc.vosi.avail.CheckURL;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URL;
+import ca.nrc.cadc.vosi.AvailabilityPlugin;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;

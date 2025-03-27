@@ -69,8 +69,12 @@
 package ca.nrc.cadc.nameresolver;
 
 import ca.nrc.cadc.util.ArrayUtil;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
 
 
 class TargetResolverRequest {
@@ -122,8 +126,7 @@ class TargetResolverRequest {
 
         final String[] serviceArray = requestMap.get("service");
 
-        this.services.addAll(ArrayUtil.isEmpty(serviceArray) ? Arrays.asList(Service.values()) : getServices
-            (serviceArray));
+        this.services.addAll(ArrayUtil.isEmpty(serviceArray) ? Arrays.asList(Service.values()) : getServices(serviceArray));
 
         final String[] formatParam = requestMap.get("format");
         this.format = getFormat(formatParam);
@@ -190,6 +193,9 @@ class TargetResolverRequest {
                     services.add(Service.VIZIER);
                     break;
                 }
+
+                default:
+                    throw new IllegalArgumentException("Unknown service: " + service);
             }
         }
 

@@ -78,11 +78,9 @@ import ca.nrc.cadc.dali.tables.votable.VOTableTable;
 import ca.nrc.cadc.nameresolver.Parser;
 import ca.nrc.cadc.nameresolver.TargetData;
 import ca.nrc.cadc.nameresolver.exception.TargetDataParsingException;
-
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -91,7 +89,7 @@ import org.apache.log4j.Logger;
  * @author jburke
  */
 public class NedVOTableParser extends DefaultParser implements Parser {
-    private final static Logger log = Logger.getLogger(NedVOTableParser.class);
+    private static final Logger log = Logger.getLogger(NedVOTableParser.class);
 
     private static final String RA_FIELD_NAME = "RA";
     private static final String DEC_FIELD_NAME = "DEC";
