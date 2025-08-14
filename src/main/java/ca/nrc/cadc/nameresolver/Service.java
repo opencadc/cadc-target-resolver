@@ -77,7 +77,7 @@ public enum Service {
             "HTTP/1.1\r\n\r\n", false),
 
     // Queries the SIMBAD service at CDS.
-    SIMBAD("simbad", "simbad.u-strasbg.fr", 80,
+    SIMBAD("simbad", "simbad.cds.unistra.fr", 80,
             HttpMethod.GET, "/simbad/sim-id?"
         + "output.max=1&output.format=ASCII"
         + "&obj.coo1=on&obj.coo2=off&obj.coo3=off&obj.coo4=off"
