@@ -10,6 +10,12 @@
     </interface>
   </capability>
 
+  <capability standardID="ivo://ivoa.net/std/VOSI#availability">
+    <interface xsi:type="vs:ParamHTTP" role="std">
+      <accessURL use="full">https://replace.me.com/cadc-target-resolver/availability</accessURL>
+    </interface>
+  </capability>
+
   <capability standardID="vos://cadc.nrc.ca~vospace/CADC/std/Logging#control-1.0">
     <interface xsi:type="vs:ParamHTTP" role="std" version="1.0">
       <accessURL use="full">https://replace.me.com/cadc-target-resolver/logControl</accessURL>
@@ -23,4 +29,3 @@
   </capability>
 
 </vosi:capabilities>
-
